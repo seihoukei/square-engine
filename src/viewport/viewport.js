@@ -19,8 +19,6 @@ export default class Viewport extends Trigger.Class(["change"]) {
 		this.#updateDimensions()
 	}
 	
-// private
-
 	// set up viewport and canvas dimensions
 	#updateDimensions() {
 		//surface size
@@ -39,7 +37,6 @@ export default class Viewport extends Trigger.Class(["change"]) {
 		this.events.change(this.width, this.height)
 	}
 	
-// public
 	getSurfaceSize(info = {}) {
 		info.width  = this.realWidth
 		info.height = this.realHeight

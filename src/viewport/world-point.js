@@ -1,11 +1,3 @@
-const COPY_MODE = {
-	NONE : 0,
-	EXTRACT : 1, 	// only overwrite already present fields
-	MERGE : 2,		// overwrite old data
-	COPY : 3,		// remove old data, shallow copy
-	REFERENCE : 4,	// copy by reference
-}
-
 const DEFAULT_COORDINATES = {
 	x : 0,
 	y : 0,
@@ -13,14 +5,20 @@ const DEFAULT_COORDINATES = {
 }
 
 export default class WorldPoint{
-	constructor(data) {
-		this.data  = Object.assign({}, data)
-		this.real  = Object.assign({}, DEFAULT_COORDINATES, this.data.real )
-		this.world = Object.assign({}, DEFAULT_COORDINATES, this.data.world)
+	real = Object.assign({}, DEFAULT_COORDINATES)
+	world = Object.assign({}, DEFAULT_COORDINATES)
+	
+	constructor(x, y, view, world = false) {
+		this.view = view
+		
+		if (world)
+			this.setWorld(x, y)
+		else
+			this.setReal(x, y)
 	}
 	
 	// stores real coordinates, and updates world coordinates if viewport is provided
-	setReal(x, y, viewport) {
+	setReal(x, y, both = this.view !== undefined) {
 		if (this.real.x !== x || this.real.y !== y) {
 			this.real.x = x
 			this.real.y = y
@@ -28,17 +26,18 @@ export default class WorldPoint{
 		} else
 			this.real.changed = false
 		
-		if (viewport !== undefined) {
+		if (both) {
 			this.setWorld(
-				viewport.getWorldX(x),
-				viewport.getWorldY(y),
+				this.view.getWorldX(x),
+				this.view.getWorldY(y),
+				false,
 			)
 		}
 		return this.real.changed
 	}
 	
 	// stores world coordinates, and updates real coordinates if viewport is provided
-	setWorld(x, y, viewport) {
+	setWorld(x, y, both = this.view !== undefined) {
 		if (this.world.x !== x || this.world.y !== y) {
 			this.world.x = x
 			this.world.y = y
@@ -46,38 +45,23 @@ export default class WorldPoint{
 		} else
 			this.world.changed = false
 		
-		if (viewport !== undefined) {
+		if (both) {
 			this.setReal(
-				viewport.getRealX(x),
-				viewport.getRealY(y),
+				view.getRealX(x),
+				view.getRealY(y),
+				false,
 			)
 		}
+		
 		return this.world.changed
 	}
 	
-	setData(data, copyData = COPY_MODE.MERGE) {
-		switch (copyData) {
-			case COPY_MODE.MERGE : 
-				Object.assign(this.data, data) 
-				break
-			case COPY_MODE.COPY :
-				this.data = Object.assign({}, data) 
-				break
-			case COPY_MODE.REFERENCE :
-				this.data = data
-				break
-		}
-	}
-	
 	// copy data from another state
-	set(point, copyData) {
-		this.real.x  = point.real.x
-		this.real.y  = point.real.y
-		
-		this.world.x = point.world.x
-		this.world.y = point.world.y
-
-		this.setData(point.data, copyData)
+	set(point, world = false) {
+		if (world) {
+			return this.setWorld(point.world.x, point.world.y)
+		}
+		return this.setReal(point.real.x, point.real.y)
 	}
 }
 	
