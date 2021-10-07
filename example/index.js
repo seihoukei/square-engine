@@ -26,23 +26,30 @@ class NodeElement extends GLSceneElement {
 
 class TestGLScene extends GLScene {
     build() {
-        this.addElement(this, new BGElement(this))
-        this.addElement(this, new NodeElement(this))
+        this.addElement(new BGElement(this))
+        this.addElement(new NodeElement(this))
     }
 }
 
 window.onload = () => {
+    // layout
     const grid = DOM.createDiv(document.body, "layout")
     const holder = DOM.createDiv(grid, "main-container")
     const canvas = DOM.createElement("canvas", "main", holder)
     
+    // renderer
     const viewport = new Viewport(canvas)
-    const view = new WorldView(viewport)
-    const renderer = new GLRenderer(canvas)
+    const renderer = new GLRenderer(viewport)
     
+    const view = new WorldView(viewport)
     const scene = new TestGLScene(renderer)
     
+    renderer.setView(view)
     renderer.setScene(scene)
+    
+    renderer.activate()
+    
+    
     
     if (window.dev?.isVerbose() ?? 0) {
         function logCanvasSize(x = canvas.width, y = canvas.height) {
@@ -63,22 +70,5 @@ window.onload = () => {
         logView()
         Trigger.on(view.events.change, logView)
     }
-    
-    window.canvas = canvas
-    window.viewport = viewport
-    window.view = view
-    window.renderer = renderer
-    
-    
-    requestAnimationFrame(frame)
-}
 
-function frame() {
-    window.viewport.updateSize()
-    window.view.advance()
-    
-    window.renderer.setView(window.view)
-    window.renderer.render()
-
-    requestAnimationFrame(frame)
 }

@@ -3,6 +3,7 @@ export default class GLSceneElement {
     
     constructor(scene) {
         this.scene = scene
+        this.renderer = scene.renderer
         this.build()
     }
     
@@ -21,6 +22,10 @@ export default class GLSceneElement {
     
     setLength(length) {
         this.length = length
+    }
+    
+    render() {
+    
     }
     
     build() {}

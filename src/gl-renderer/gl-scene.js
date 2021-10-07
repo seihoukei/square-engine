@@ -15,12 +15,15 @@ export default class GLScene {
     
     getBuffer(name, type, length) {
         if (this.buffers[name]) {
-            //check compatibility
+            //TODO: check compatibility
+        
             return this.buffers[name]
         }
         
         const buffer = new GLBuffer(this.renderer, length)
-        //init buffer
+        
+        //TODO: init buffer
+        
         this.buffers[name] = buffer
         return buffer
     }
@@ -34,4 +37,10 @@ export default class GLScene {
     }
     
     build() {}
+    
+    activate() {}
+    
+    deactivate() {}
+    
+    updateView(view) {}
 }
