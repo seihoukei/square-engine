@@ -1,30 +1,48 @@
 import Trigger from "../utility/trigger.js"
+import GLProgram from "./gl-program.js"
+import GLPositionBuffers from "./gl-position-buffers.js"
 
 export default class GLRenderer {
     active = false
     boundFrame = this.frame.bind(this)
     nextFrame = -1
+    programs = {}
     
-    constructor(viewport) {
+    constructor(viewport, sources) {
         this.viewport = viewport
         this.canvas = this.viewport.canvas
+        this.sources = sources
+        
+        Trigger.on(this.viewport.events.change, (width, height) => {
+            this.gl.viewport(0, 0, width, height)
+        })
+        
         this.init()
     }
     
     init() {
         this.gl = this.canvas.getContext("webgl2", {alpha : false})
+        this.positionBuffers = new GLPositionBuffers(this.gl)
+        
+        for (let [name, sources] of Object.entries(this.sources)) {
+            this.programs[name] ??= new GLProgram(this, sources)
+            this.programs[name].init()
+        }
+        
+        if (this.scene)
+            this.scene.init()
     }
     
     setScene(scene) {
         this.scene = scene
         
-        this.scene.prepare(this.view)
+        this.scene.setView(this.view)
     }
     
     setView(view) {
         this.view = view
     
-        this.scene?.updateView(this.view)
+        this.scene?.setView(this.view)
     
         this.viewTrigger?.cancel()
         this.viewTrigger = Trigger.on(this.view.events.change, () => {
@@ -93,6 +111,4 @@ export default class GLRenderer {
     
         this.nextFrame = requestAnimationFrame(this.boundFrame)
     }
-    
-    
 }

@@ -6,10 +6,13 @@ import WorldView from "../src/viewport/world-view.js"
 import GLRenderer from "../src/gl-renderer/gl-renderer.js"
 import GLScene from "../src/gl-renderer/gl-scene.js"
 import GLSceneElement from "../src/gl-renderer/gl-scene-element.js"
+import SHADERS from "./shaders.js"
 
 class BGElement extends GLSceneElement {
     build() {
         this.useProgram("bg")
+        this.setViewUniforms("u_center", "u_size", "u_pixel")
+        this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
         this.setLength(1)
     }
@@ -17,7 +20,10 @@ class BGElement extends GLSceneElement {
 
 class NodeElement extends GLSceneElement {
     build() {
+        this.setAlpha(true)
         this.useProgram("nodes")
+        this.setViewUniforms("u_center", "u_size", "u_pixel")
+        this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
         this.setAttributeBuffer("a_node_position", "nodePosition", 1024)
         this.setLength(1024)
@@ -27,7 +33,7 @@ class NodeElement extends GLSceneElement {
 class TestGLScene extends GLScene {
     build() {
         this.addElement(new BGElement(this))
-        this.addElement(new NodeElement(this))
+//        this.addElement(new NodeElement(this))
     }
 }
 
@@ -39,13 +45,13 @@ window.onload = () => {
     
     // renderer
     const viewport = new Viewport(canvas)
-    const renderer = new GLRenderer(viewport)
+    const renderer = new GLRenderer(viewport, SHADERS)
     
     const view = new WorldView(viewport)
     const scene = new TestGLScene(renderer)
     
-    renderer.setView(view)
     renderer.setScene(scene)
+    renderer.setView(view)
     
     renderer.activate()
     
@@ -62,13 +68,18 @@ window.onload = () => {
         Trigger.on(viewport.events.change, logCanvasSize)
         
         function logView() {
-            dev.report("view.x", view.current.x, "view.x.last")
-            dev.report("view.y", view.current.y, "view.y.last")
-            dev.report("view.zoom", view.current.zoom, "view.zoom.last")
+            const info = {}
+            view.getSize(info)
+            view.getView(info)
+            
+            dev.report("view.center", `${info.x}, ${info.y}`, "view.center.last")
+            dev.report("view.zoom", info.zoom, "view.zoom.last")
+            dev.report("view.size", `${info.width}, ${info.height}`, "view.size.last")
         }
         
         logView()
         Trigger.on(view.events.change, logView)
     }
 
+    window.renderer = renderer
 }
