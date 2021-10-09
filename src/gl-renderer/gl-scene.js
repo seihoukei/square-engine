@@ -3,22 +3,58 @@ import Trigger from "../utility/trigger.js"
 
 export default class GLScene {
     buffers = {}
-    elements = []
+    elements = {}
     viewData = {}
+    renderQueue = []
     
     constructor(renderer) {
         this.renderer = renderer
         this.build()
+        this.init()
     }
     
     init() {
-        for (let element of this.elements) {
+        for (let element of Object.values(this.elements)) {
             element.init()
         }
     }
     
-    addElement(element) {
-        this.elements.push(element)
+    addElement(element, id = `_element${Object.values(this.elements).length}`, order = this.renderQueue.length) {
+        this.elements[id] = element
+        if (order < 0)
+            return
+        this.queueElement(element, order)
+    }
+    
+    queueElement(element, order = this.renderQueue.length) {
+        if (typeof element === "string")
+            element = this.elements[element]
+        if (element === undefined)
+            return
+        
+        for (let i = 0; i < this.renderQueue.length; i++) {
+            if (this.renderQueue[i].order <= order)
+                continue
+        
+            this.renderQueue.splice(i, 0, [{element, order}])
+            return
+        }
+        
+        this.renderQueue.push({
+            element, order
+        })
+    }
+    
+    disableElement(element, order) {
+        if (typeof element === "string")
+            element = this.elements[element]
+        if (element === undefined)
+            return
+        
+        for (let i = this.renderQueue.length - 1; i >= 0; i--) {
+            if (this.renderQueue[i].element === element && (order === undefined || this.renderQueue[i].order === order))
+                this.renderQueue.splice(i,1)
+        }
     }
     
     getBuffer(name, type, length) {
@@ -45,7 +81,7 @@ export default class GLScene {
         for (let buffer of Object.values(this.buffers))
             buffer.update()
         
-        for (let element of this.elements) {
+        for (let {element} of this.renderQueue) {
             element.setSpecialUniformData("now", now)
             element.render()
         }
@@ -65,6 +101,15 @@ export default class GLScene {
         })
     }
     
+    setLength(elementName, length = 0) {
+        const element = this.elements[elementName]
+        if (!element) {
+            console.warn(`Element ${elementName} not found`)
+            return false
+        }
+        element.setLength(length)
+    }
+    
     activate() {}
     
     deactivate() {}
@@ -74,7 +119,7 @@ export default class GLScene {
         view.getCenter(this.viewData)
         this.pixelSize = view.getWorldPixelSize()
     
-        for (let element of this.elements) {
+        for (let element of Object.values(this.elements)) {
             element.setSpecialUniformData("viewCenter", [this.viewData.x, this.viewData.y])
             element.setSpecialUniformData("viewSize", [this.viewData.width, this.viewData.height])
             element.setSpecialUniformData("pixelSize", this.pixelSize)

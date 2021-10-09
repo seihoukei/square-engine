@@ -1,19 +1,19 @@
+import GLBuffer from "./gl-buffer.js"
+
 export default class GLPositionBuffers {
     static QUAD_ARRAYS = {
         CENTERED : new Float32Array([
             -1, -1,
             -1,  1,
-            1, -1,
-            -1,  1,
-            1, -1,
             1,  1,
+            1, -1,
         ]),
     }
     
     buffers = new Map()
     
-    constructor(gl) {
-        this.gl = gl
+    constructor(renderer) {
+        this.renderer = renderer
     }
     
     get(array) {
@@ -21,11 +21,10 @@ export default class GLPositionBuffers {
         if (oldBuffer)
             return oldBuffer
         
-        const gl = this.gl
+        const buffer = new GLBuffer(this.renderer, array.length)
         
-        const buffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-        gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW)
+        buffer.initBuffer()
+        buffer.updateData(array, WebGL2RenderingContext.STATIC_DRAW)
         
         this.buffers.set(array, buffer)
         return buffer

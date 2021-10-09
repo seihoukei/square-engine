@@ -2,14 +2,14 @@ import GLPositionBuffers from "./gl-position-buffers.js"
 
 
 export default class GLSceneElement {
-    length = 0
+    length = 1
+    maxLength = 1
     uniforms = {}
     specialUniforms = {}
 
     constructor(scene) {
         this.scene = scene
         this.renderer = scene.renderer
-        this.init()
     }
     
     init() {
@@ -23,6 +23,11 @@ export default class GLSceneElement {
         this.program = this.renderer.programs[name]
     }
     
+    setMaxLength(maxLength, defaultLength = maxLength) {
+        this.maxLength = maxLength
+        this.length = defaultLength
+    }
+    
     setPositionAttribute(name, array = GLPositionBuffers.QUAD_ARRAYS.CENTERED) {
         const attribute = this.program.attributes[name]
         if (!attribute)
@@ -32,15 +37,17 @@ export default class GLSceneElement {
 
         const buffer = this.renderer.positionBuffers.get(array)
         attribute.setBuffer(buffer)
+        
+        this.positionLength = array.length / 2
     }
     
-    setAttributeBuffer(name, buffer, length, options = {}) {
+    setAttributeBuffer(name, buffer, options = {}) {
         const attribute = this.program.attributes[name]
         if (!attribute)
             return
         
         if (typeof buffer === "string")
-            buffer = this.scene.getBuffer(buffer, attribute.type, length)
+            buffer = this.scene.getBuffer(buffer, attribute.glType, this.maxLength)
 
         attribute.setBuffer(buffer, options)
     }
@@ -73,6 +80,7 @@ export default class GLSceneElement {
             console.warn("Unknown uniform "+uniform)
         
         Object.defineProperty(this.specialUniforms, type, {
+            configurable : true,
             set: (value) => {
                 this.uniforms[uniform] = value
             }
@@ -87,9 +95,9 @@ export default class GLSceneElement {
     }
     
     setLength(length) {
-        this.length = length
+        this.length = Math.clamp(0, length, this.maxLength)
     }
-    
+
     setAlpha(value) {
         this.alpha = value
     }
@@ -122,7 +130,7 @@ export default class GLSceneElement {
         }
 */
     
-        gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.length)
+        gl.drawArraysInstanced(gl.TRIANGLE_FAN, 0, this.positionLength, this.length)
     }
     
     build() {}

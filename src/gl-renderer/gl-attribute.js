@@ -10,7 +10,7 @@ export default class GLAttribute {
     setBuffer(buffer, options = {}) {
         const gl = this.renderer.gl
     
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+        buffer.bind()
         gl.enableVertexAttribArray(this.address)
     
         this.setPointer(
@@ -31,8 +31,10 @@ export default class GLAttribute {
     
         const data = gl.getActiveAttrib(program, index)
         this.name = data.name
+        this.glType = data.type
     
-        const type = GLTypes.get(data.type)
+        const type = GLTypes.get(this.glType)
+        
         this.type = type.type
         this.size = type.size
         this.arrayType = type.arrayType

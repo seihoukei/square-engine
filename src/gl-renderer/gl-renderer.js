@@ -22,7 +22,7 @@ export default class GLRenderer {
     
     init() {
         this.gl = this.canvas.getContext("webgl2", {alpha : false})
-        this.positionBuffers = new GLPositionBuffers(this.gl)
+        this.positionBuffers = new GLPositionBuffers(this)
         
         for (let [name, sources] of Object.entries(this.sources)) {
             this.programs[name] ??= new GLProgram(this, sources)
@@ -35,7 +35,7 @@ export default class GLRenderer {
     
     setScene(scene) {
         this.scene = scene
-        
+    
         this.scene.setView(this.view)
     }
     

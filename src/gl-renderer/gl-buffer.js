@@ -37,16 +37,14 @@ export default class GLBuffer {
         this.lastGl = this.renderer.gl
     }
     
-    setInstanceAttribute(instance, ...values) {
+    setInstanceData(instance, ...values) {
         if (!this.initialized)
             throw new Error("Buffer not initialized")
 
         if (typeof values[0] === "object")
             values = values[0]
         
-        const size = values.length
-        
-        this.data.set(values, instance * size)
+        this.data.set(values, instance * this.glData.size)
         this.changed = true
     }
     
@@ -54,11 +52,23 @@ export default class GLBuffer {
         if (!this.changed && !forced)
             return
     
-        const gl = this.renderer.gl
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
-        gl.bufferData(gl.ARRAY_BUFFER, this.data, gl.DYNAMIC_DRAW)
+        this.updateData()
         
         this.changed = this.forceUpdate
+    }
+    
+    bind() {
+        const gl = this.renderer.gl
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
+    }
+    
+    updateData(data = this.data, type = WebGL2RenderingContext.DYNAMIC_DRAW) {
+        const gl = this.renderer.gl
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
+        gl.bufferData(gl.ARRAY_BUFFER, data, type)
+    }
+    
+    setData(data) {
+        this.data.set(data, 0)
     }
 }
