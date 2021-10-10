@@ -1,21 +1,30 @@
 import GLBuffer from "./gl-buffer.js"
 import Trigger from "../utility/trigger.js"
+import GLTexture from "./gl-texture.js"
 
-export default class GLScene {
+export default class GLScene extends Trigger.Class(["updateView"]) {
     buffers = {}
     elements = {}
     viewData = {}
+    textures = {}
     renderQueue = []
     
     constructor(renderer) {
+        super()
         this.renderer = renderer
         this.build()
         this.init()
     }
     
     init() {
+        for (let buffer of Object.values(this.buffers)) {
+            buffer.initBuffer()
+        }
         for (let element of Object.values(this.elements)) {
             element.init()
+        }
+        for (let texture of Object.values(this.textures)) {
+            texture.init()
         }
     }
     
@@ -24,6 +33,7 @@ export default class GLScene {
         if (order < 0)
             return
         this.queueElement(element, order)
+        return element
     }
     
     queueElement(element, order = this.renderQueue.length) {
@@ -57,10 +67,20 @@ export default class GLScene {
         }
     }
     
+    createBuffer(name, type, length) {
+        const buffer = new GLBuffer(this.renderer, length)
+    
+        buffer.initBuffer()
+        buffer.initData(type)
+    
+        this.buffers[name] = buffer
+        return buffer
+    }
+    
     getBuffer(name, type, length) {
-        if (this.buffers[name]) {
+        if (this.buffers[name] !== undefined) {
             const buffer = this.buffers[name]
-            if (buffer.type !== type)
+            if (type !== undefined && buffer.glType !== type)
                 throw new Error ("Buffer type collision")
             if (length !== undefined && buffer.length !== length)
                 console.warn("Buffer length mismatch")
@@ -68,13 +88,23 @@ export default class GLScene {
             return buffer
         }
         
-        const buffer = new GLBuffer(this.renderer, length)
+        return this.createBuffer(name, type, length)
+    }
+    
+    createTexture(name, options = {}) {
+        const texture = new GLTexture(this.renderer, options)
+    
+        texture.init()
+    
+        this.textures[name] = texture
+        return texture
+    }
+
+    getTexture(name) {
+        if (this.textures[name] !== undefined)
+            return this.textures[name]
         
-        buffer.initBuffer()
-        buffer.initData(type)
-        
-        this.buffers[name] = buffer
-        return buffer
+        return this.createTexture(name)
     }
     
     render(now) {
@@ -124,5 +154,7 @@ export default class GLScene {
             element.setSpecialUniformData("viewSize", [this.viewData.width, this.viewData.height])
             element.setSpecialUniformData("pixelSize", this.pixelSize)
         }
+        
+        this.events.updateView(this.viewData)
     }
 }

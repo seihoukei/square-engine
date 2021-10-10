@@ -6,14 +6,24 @@ export default class GLSceneElement {
     maxLength = 1
     uniforms = {}
     specialUniforms = {}
+    textures = []
+    
+    lastGl
 
     constructor(scene) {
         this.scene = scene
         this.renderer = scene.renderer
+        this.init()
     }
     
     init() {
         const gl = this.renderer.gl
+
+        if (this.lastGl === gl)
+            return
+        
+        this.lastGl = gl
+
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)
         this.build()
@@ -21,11 +31,15 @@ export default class GLSceneElement {
     
     useProgram(name) {
         this.program = this.renderer.programs[name]
+
+        return this
     }
     
     setMaxLength(maxLength, defaultLength = maxLength) {
         this.maxLength = maxLength
         this.length = defaultLength
+
+        return this
     }
     
     setPositionAttribute(name, array = GLPositionBuffers.QUAD_ARRAYS.CENTERED) {
@@ -39,6 +53,8 @@ export default class GLSceneElement {
         attribute.setBuffer(buffer)
         
         this.positionLength = array.length / 2
+
+        return this
     }
     
     setAttributeBuffer(name, buffer, options = {}) {
@@ -50,24 +66,34 @@ export default class GLSceneElement {
             buffer = this.scene.getBuffer(buffer, attribute.glType, this.maxLength)
 
         attribute.setBuffer(buffer, options)
+
+        return this
     }
     
     setViewUniforms(center, size, pixel) {
         this.setSpecialUniform("viewCenter", center)
         this.setSpecialUniform("viewSize", size)
         this.setSpecialUniform("pixelSize", pixel)
+
+        return this
     }
     
     setTimeUniform(uniform) {
         this.setSpecialUniform("now", uniform)
+
+        return this
     }
     
     setPhaseUniform(uniform) {
         this.setSpecialUniform("phase", uniform)
+
+        return this
     }
     
     setCursorUniform(uniform) {
         this.setSpecialUniform("cursor", uniform)
+
+        return this
     }
     
     setSpecialUniform(type, uniform) {
@@ -85,6 +111,8 @@ export default class GLSceneElement {
                 this.uniforms[uniform] = value
             }
         })
+
+        return this
     }
     
     setSpecialUniformData(type, value) {
@@ -92,14 +120,48 @@ export default class GLSceneElement {
             return
         
         this.specialUniforms[type] = value
+
+        return this
     }
     
     setLength(length) {
         this.length = Math.clamp(0, length, this.maxLength)
+
+        return this
     }
 
     setAlpha(value) {
         this.alpha = value
+
+        return this
+    }
+    
+    setUniform(uniform, value) {
+        if (this.program.uniforms[uniform] === undefined)
+            console.warn("Unknown uniform "+uniform)
+        
+        this.uniforms[uniform] = value
+        
+        return this
+    }
+    
+    setTexture(target, name, slot = this.textures.length) {
+        if (!this.program.uniforms[target]?.isTexture){
+            console.warn(`${target} is not a sampler uniform`)
+            return
+        }
+        this.textures[slot] = this.scene.getTexture(name)
+        this.uniforms[target] = slot
+        
+        return this
+    }
+    
+    setTargetTexture(name, clear = true, layer = 0) {
+        this.targetTexture = this.scene.getTexture(name)
+        this.targetLayer = layer
+        this.clearTarget = clear
+    
+        return this
     }
     
     render() {
@@ -107,6 +169,11 @@ export default class GLSceneElement {
             return
     
         const gl = this.renderer.gl
+        
+        if (this.targetTexture) {
+            this.targetTexture.unbind()
+            this.renderer.setTarget(this.targetTexture, this.clearTarget, this.targetLayer)
+        }
         
         this.program.use()
     
@@ -124,13 +191,15 @@ export default class GLSceneElement {
             this.program.setUniform(name, value)
         }
     
-/*
-        if (this.textures !== undefined) {
-            this.scene.setTextures(this.textures)
+        for (let [index, texture] of Object.entries(this.textures)) {
+            texture.setSlot(+index)
         }
-*/
     
         gl.drawArraysInstanced(gl.TRIANGLE_FAN, 0, this.positionLength, this.length)
+    
+        if (this.targetTexture) {
+            this.renderer.resetTarget()
+        }
     }
     
     build() {}

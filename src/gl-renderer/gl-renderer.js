@@ -7,6 +7,7 @@ export default class GLRenderer {
     boundFrame = this.frame.bind(this)
     nextFrame = -1
     programs = {}
+    target
     
     constructor(viewport, sources) {
         this.viewport = viewport
@@ -14,10 +15,37 @@ export default class GLRenderer {
         this.sources = sources
         
         Trigger.on(this.viewport.events.change, (width, height) => {
-            this.gl.viewport(0, 0, width, height)
+            this.resetViewport()
         })
         
         this.init()
+    }
+    
+    resetViewport() {
+        if (this.target === undefined)
+            this.gl.viewport(0, 0, this.viewport.width, this.viewport.height)
+    }
+    
+    setTarget(texture, clear = false, layer = 0) {
+        this.target = texture
+        const gl = this.gl
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderFramebuffer)
+        texture.setFramebufferSlot(0, layer)
+        if (clear)
+            gl.clear(gl.COLOR_BUFFER_BIT)
+    }
+    
+    resetTarget() {
+        if (!this.target)
+            return
+        
+        delete this.target
+        
+        const gl = this.gl
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+        
+        this.resetViewport()
+    
     }
     
     init() {
@@ -31,6 +59,11 @@ export default class GLRenderer {
         
         if (this.scene)
             this.scene.init()
+        
+        this.renderFramebuffer = this.gl.createFramebuffer()
+        
+        this.resetTarget()
+        this.resetViewport()
     }
     
     setScene(scene) {

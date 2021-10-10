@@ -11,11 +11,13 @@ import SHADERS from "./shaders.js"
 
 class BGElement extends GLSceneElement {
     build() {
+        this.setAlpha(true)
         this.setMaxLength(1)
         this.useProgram("bg")
-        this.setViewUniforms("u_center", "u_size", "u_pixel")
+        this.setViewUniforms("u_center", "u_size")
         this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
+        this.setTexture("u_bg_nodes", "bg_nodes")
     }
 }
 
@@ -24,17 +26,38 @@ class NodesElement extends GLSceneElement {
         this.setAlpha(true)
         this.setMaxLength(1024, 0)
         this.useProgram("nodes")
-        this.setViewUniforms("u_center", "u_size", "u_pixel")
+        this.setViewUniforms("u_center", "u_size")
+//        this.setTimeUniform("u_now")
+        this.setPositionAttribute("a_position")
+        this.setAttributeBuffer("a_node_data", "nodeData")
+//        this.setTargetTexture("bg_nodes", true)
+    }
+}
+
+class BGNodesElement extends GLSceneElement {
+    build() {
+        this.setAlpha(true)
+        this.setMaxLength(1024, 0)
+        this.useProgram("bg_nodes")
+        this.setViewUniforms("u_center", "u_size")
         this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
         this.setAttributeBuffer("a_node_data", "nodeData")
+        this.setTargetTexture("bg_nodes", true)
     }
 }
 
 class TestGLScene extends GLScene {
     build() {
+        this.createTexture("bg_nodes", {
+            width : 1024,
+            height : 512,
+        })
+
+        this.addElement(new BGNodesElement(this), "bg_nodes")
         this.addElement(new BGElement(this), "bg")
         this.addElement(new NodesElement(this), "nodes")
+        
     }
 }
 
@@ -105,6 +128,7 @@ window.onload = () => {
     bounds.top += 100
     view.setBoundaries(bounds)
     scene.setLength("nodes", nodes.length)
+    scene.setLength("bg_nodes", nodes.length)
     
     if (window.dev?.isVerbose("canvasSize") ?? 0) {
         function logCanvasSize(x = canvas.width, y = canvas.height) {

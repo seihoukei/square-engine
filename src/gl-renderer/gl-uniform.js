@@ -14,6 +14,7 @@ export default class GLUniform {
         const type = GLTypes.get(data.type)
         this.type = type.type
         this.size = type.size
+        this.isTexture = type.isTexture
     
         const address = gl.getUniformLocation(program, data.name)
         this.address = address
