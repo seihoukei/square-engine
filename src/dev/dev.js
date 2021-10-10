@@ -59,8 +59,8 @@ class SquareDev {
     updateDisplay() {
         this.display.innerText = Object.entries(this.data).filter(x => x[0] !== "log" || x[1].length > 0).map(x => x.join(": ")).join("\n")
     }
-    
 }
+
 
 addEventListener("load", () => {
     window.dev = new SquareDev()

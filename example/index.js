@@ -1,13 +1,17 @@
 import "../src/dev/dev.js"  //debug module
 import "../src/utility/math.js"
 import DOM from "../src/utility/dom.js"
-import Viewport from "../src/viewport/viewport.js"
 import Trigger from "../src/utility/trigger.js"
-import WorldView from "../src/viewport/world-view.js"
 import GLRenderer from "../src/gl-renderer/gl-renderer.js"
 import GLScene from "../src/gl-renderer/gl-scene.js"
 import GLSceneElement from "../src/gl-renderer/gl-scene-element.js"
-import SHADERS from "./shaders.js"
+import Web from "../src/utility/web.js"
+
+const SOURCES = {
+    nodes : "./shaders/nodes",
+    bg : "./shaders/bg",
+    bg_nodes : "./shaders/bg_nodes",
+}
 
 class BGElement extends GLSceneElement {
     build() {
@@ -59,10 +63,15 @@ class TestGLScene extends GLScene {
     }
 }
 
-window.onload = () => {
+window.onload = async () => {
     window.dev?.setVerbose("canvasSize", 0)
     window.dev?.setVerbose("viewSize", 0)
 //    window.dev?.setVerbose("shaders", 0)
+    
+    const shaders = await Web.loadShaders(SOURCES)
+    
+    window.stopServiceWorkerLoader?.()
+    document.getElementById("loader").remove()
     
     // layout
     const grid = DOM.createDiv(document.body, "layout")
@@ -71,7 +80,7 @@ window.onload = () => {
     
     // renderer
     const renderer = new GLRenderer(canvas, {
-        sources: SHADERS,
+        sources: shaders,
     })
     
     const scene = new TestGLScene(renderer, {
