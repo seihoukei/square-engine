@@ -1,17 +1,23 @@
 import GLBuffer from "./gl-buffer.js"
 import Trigger from "../utility/trigger.js"
 import GLTexture from "./gl-texture.js"
+import GLTypes from "./gl-types.js"
+import WorldView from "../viewport/world-view.js"
 
-export default class GLScene extends Trigger.Class(["updateView"]) {
+export default class GLScene extends Trigger.Class(["updateView", "activate", "deactivate"]) {
     buffers = {}
     elements = {}
     viewData = {}
     textures = {}
     renderQueue = []
     
-    constructor(renderer) {
+    constructor(renderer, settings = {}) {
         super()
+        
         this.renderer = renderer
+        
+        this.setView(new WorldView(renderer.getViewport(), settings.viewSettings))
+        
         this.build()
         this.init()
     }
@@ -67,20 +73,20 @@ export default class GLScene extends Trigger.Class(["updateView"]) {
         }
     }
     
-    createBuffer(name, type, length) {
+    createBuffer(name, type, length, options) {
         const buffer = new GLBuffer(this.renderer, length)
     
         buffer.initBuffer()
-        buffer.initData(type)
+        buffer.initData(options.normalize ?? type, GLTypes.get(type).size)
     
         this.buffers[name] = buffer
         return buffer
     }
     
-    getBuffer(name, type, length) {
+    getBuffer(name, type, length, options = {}) {
         if (this.buffers[name] !== undefined) {
             const buffer = this.buffers[name]
-            if (type !== undefined && buffer.glType !== type)
+            if (type !== undefined && buffer.type !== GLTypes.get(type).type)
                 throw new Error ("Buffer type collision")
             if (length !== undefined && buffer.length !== length)
                 console.warn("Buffer length mismatch")
@@ -88,7 +94,7 @@ export default class GLScene extends Trigger.Class(["updateView"]) {
             return buffer
         }
         
-        return this.createBuffer(name, type, length)
+        return this.createBuffer(name, type, length, options)
     }
     
     createTexture(name, options = {}) {
@@ -97,6 +103,19 @@ export default class GLScene extends Trigger.Class(["updateView"]) {
         texture.init()
     
         this.textures[name] = texture
+        return texture
+    }
+    
+    createViewportTexture(name, options = {}) {
+        options.width = this.renderer.viewport.width
+        options.height = this.renderer.viewport.height
+        
+        const texture = this.createTexture(name, options)
+        
+        Trigger.on(this.renderer.viewport.events.change, (width, height) => {
+            texture.setSize(width, height)
+        })
+        
         return texture
     }
 
@@ -131,6 +150,10 @@ export default class GLScene extends Trigger.Class(["updateView"]) {
         })
     }
     
+    setBoundaries(boundaries, zoomOut) {
+        this.view.setBoundaries(boundaries, zoomOut)
+    }
+    
     setLength(elementName, length = 0) {
         const element = this.elements[elementName]
         if (!element) {
@@ -140,9 +163,13 @@ export default class GLScene extends Trigger.Class(["updateView"]) {
         element.setLength(length)
     }
     
-    activate() {}
+    activate() {
+        this.events.activate()
+    }
     
-    deactivate() {}
+    deactivate() {
+        this.events.deactivate()
+    }
     
     updateView(view) {
         view.getSize(this.viewData)

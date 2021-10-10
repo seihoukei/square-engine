@@ -13,7 +13,7 @@ export default class GLBuffer {
         this.renderer = renderer
     }
     
-    initData(glType) {
+    initData(glType, size) {
         if (this.initialized) {
             if (glType !== this.glType)
                 throw new Error ("Buffer type collision")
@@ -23,8 +23,11 @@ export default class GLBuffer {
         
         this.glType = glType
         this.glData = GLTypes.get(glType)
+    
+        this.size = size ?? this.glData.size
         
-        this.data = new this.glData.arrayType(this.glData.size * this.length)
+        this.type = this.glData.type
+        this.data = new this.glData.arrayType(this.size * this.length)
         
         this.initialized = true
     }
@@ -44,7 +47,7 @@ export default class GLBuffer {
         if (typeof values[0] === "object")
             values = values[0]
         
-        this.data.set(values, instance * this.glData.size)
+        this.data.set(values, instance * this.size)
         this.changed = true
     }
     

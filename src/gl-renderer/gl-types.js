@@ -56,6 +56,14 @@ export default class GLTypes {
             size: 1,
             type: WebGL2RenderingContext.UNSIGNED_SHORT,
         },
+        [WebGL2RenderingContext.UNSIGNED_BYTE]: {
+            attributePointerSetter: "vertexAttribIPointer",
+            arrayType: Uint8Array,
+            arraySetter: "uniform1uiv",
+            setter: "uniform1ui",
+            size: 1,
+            type: WebGL2RenderingContext.UNSIGNED_BYTE,
+        },
         [WebGL2RenderingContext.INT_VEC2]: {
             attributePointerSetter: "vertexAttribIPointer",
             arrayType: Int32Array,

@@ -30,6 +30,7 @@ class NodesElement extends GLSceneElement {
 //        this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
         this.setAttributeBuffer("a_node_data", "nodeData")
+        this.setNormalizedAttributeBuffer("a_node_color", "nodeColor")
 //        this.setTargetTexture("bg_nodes", true)
     }
 }
@@ -40,24 +41,21 @@ class BGNodesElement extends GLSceneElement {
         this.setMaxLength(1024, 0)
         this.useProgram("bg_nodes")
         this.setViewUniforms("u_center", "u_size")
-        this.setTimeUniform("u_now")
+//        this.setTimeUniform("u_now")
         this.setPositionAttribute("a_position")
         this.setAttributeBuffer("a_node_data", "nodeData")
-        this.setTargetTexture("bg_nodes", true)
+        this.setTargetTexture("bg_nodes", [0.5,0.5,0.5,1.0])
     }
 }
 
 class TestGLScene extends GLScene {
     build() {
-        this.createTexture("bg_nodes", {
-            width : 1024,
-            height : 512,
-        })
-
-        this.addElement(new BGNodesElement(this), "bg_nodes")
-        this.addElement(new BGElement(this), "bg")
-        this.addElement(new NodesElement(this), "nodes")
+        this.createViewportTexture("bg_nodes")
         
+        this.addElement(new BGNodesElement(this), "bg_nodes")
+        this.addElement(new BGElement(this), "bg").setUniform("u_front", 0)
+        this.addElement(new NodesElement(this), "nodes")
+        this.addElement(new BGElement(this), "fg").setUniform("u_front", 1)
     }
 }
 
@@ -72,36 +70,45 @@ window.onload = () => {
     const canvas = DOM.createElement("canvas", "main", holder)
     
     // renderer
-    const viewport = new Viewport(canvas)
-    const renderer = new GLRenderer(viewport, SHADERS)
-    
-    const view = new WorldView(viewport, {
-        expandView: 100,
+    const renderer = new GLRenderer(canvas, {
+        sources: SHADERS,
     })
-    const scene = new TestGLScene(renderer)
+    
+    const scene = new TestGLScene(renderer, {
+        viewSettings: {
+            expandView: 100,
+        }
+    })
     
     renderer.setScene(scene)
-    renderer.setView(view)
     
     renderer.activate()
     
     const nodes = []
     
     let distance = 0
+    let angle = 0
     for (let i = 0; i < 16; i++) {
-        const angle = Math.random() * Math.PI * 2
+        angle += Math.PI / 2 + Math.random() * Math.PI
         const size = Math.random() * 50 + 30
-        if (i > 0)
-            distance += size + 20
         
         const node = {
             index : i,
             x : distance * Math.cos(angle),
             y : distance * Math.sin(angle),
             size,
+            color: [
+                Math.random() * 255 | 0,
+                Math.random() * 255 | 0,
+                Math.random() * 255 | 0,
+                255,
+            ]
         }
         
         nodes.push(node)
+        
+        if (i === 0)
+            distance += 80
         
         distance += size
     }
@@ -113,20 +120,22 @@ window.onload = () => {
         bottom : Infinity,
     }
     
-    const buffer = scene.getBuffer("nodeData")
+    const dataBuffer = scene.getBuffer("nodeData")
+    const colorBuffer = scene.getBuffer("nodeColor")
     for (let node of nodes) {
         if (node.x < bounds.left) bounds.left = node.x
         if (node.x > bounds.right) bounds.right = node.x
         if (node.y < bounds.bottom) bounds.bottom = node.y
         if (node.y > bounds.top) bounds.top = node.y
         
-        buffer.setInstanceData(node.index, node.x, node.y, node.size)
+        dataBuffer.setInstanceData(node.index, node.x, node.y, node.size, node.index)
+        colorBuffer.setInstanceData(node.index, node.color)
     }
     bounds.left -= 100
     bounds.bottom -= 100
     bounds.right += 100
     bounds.top += 100
-    view.setBoundaries(bounds)
+    scene.setBoundaries(bounds)
     scene.setLength("nodes", nodes.length)
     scene.setLength("bg_nodes", nodes.length)
     
@@ -138,14 +147,14 @@ window.onload = () => {
         }
     
         logCanvasSize()
-        Trigger.on(viewport.events.change, logCanvasSize)
+        Trigger.on(renderer.events.change, logCanvasSize)
     }
 
     if (window.dev?.isVerbose("viewSize") ?? 0) {
         function logView() {
             const info = {}
-            view.getSize(info)
-            view.getView(info)
+            scene.view.getSize(info)
+            scene.view.getView(info)
             
             dev.report("view.center", `${info.x}, ${info.y}`, "view.center.last")
             dev.report("view.zoom", info.zoom, "view.zoom.last")
@@ -153,7 +162,7 @@ window.onload = () => {
         }
         
         logView()
-        Trigger.on(view.events.change, logView)
+        Trigger.on(scene.view.events.change, logView)
     }
 
     window.renderer = renderer

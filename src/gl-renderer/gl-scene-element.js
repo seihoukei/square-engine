@@ -63,11 +63,16 @@ export default class GLSceneElement {
             return
         
         if (typeof buffer === "string")
-            buffer = this.scene.getBuffer(buffer, attribute.glType, this.maxLength)
+            buffer = this.scene.getBuffer(buffer, attribute.glType, this.maxLength, options)
 
         attribute.setBuffer(buffer, options)
 
         return this
+    }
+    
+    setNormalizedAttributeBuffer(name, buffer, options = {}, normalize = WebGL2RenderingContext.UNSIGNED_BYTE) {
+        options.normalize = normalize
+        this.setAttributeBuffer(name, buffer, options)
     }
     
     setViewUniforms(center, size, pixel) {
@@ -156,12 +161,18 @@ export default class GLSceneElement {
         return this
     }
     
-    setTargetTexture(name, clear = true, layer = 0) {
+    setTargetTexture(name, clearColor = [1,1,1,1], layer = 0) {
         this.targetTexture = this.scene.getTexture(name)
         this.targetLayer = layer
-        this.clearTarget = clear
+        this.clearColor = clearColor
     
         return this
+    }
+    
+    resetTargetTexture() {
+        delete this.targetTexture
+        delete this.targetLayer
+        delete this.clearColor
     }
     
     render() {
@@ -172,7 +183,7 @@ export default class GLSceneElement {
         
         if (this.targetTexture) {
             this.targetTexture.unbind()
-            this.renderer.setTarget(this.targetTexture, this.clearTarget, this.targetLayer)
+            this.renderer.setTarget(this.targetTexture, this.clearColor, this.targetLayer)
         }
         
         this.program.use()
@@ -181,6 +192,7 @@ export default class GLSceneElement {
             if (this.alpha) {
                 gl.enable(gl.BLEND);
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+//                gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
             } else {
                 gl.disable(gl.BLEND)
             }

@@ -1,6 +1,7 @@
 import Trigger from "../utility/trigger.js"
 import GLProgram from "./gl-program.js"
 import GLPositionBuffers from "./gl-position-buffers.js"
+import Viewport from "../viewport/viewport.js"
 
 export default class GLRenderer {
     active = false
@@ -9,43 +10,17 @@ export default class GLRenderer {
     programs = {}
     target
     
-    constructor(viewport, sources) {
-        this.viewport = viewport
-        this.canvas = this.viewport.canvas
-        this.sources = sources
+    constructor(canvas, settings = {}) {
+        this.canvas = canvas
+        this.viewport = new Viewport(this.canvas, settings.viewportSettings)
         
-        Trigger.on(this.viewport.events.change, (width, height) => {
+        this.sources = settings.sources
+        
+        Trigger.on(this.viewport.events.change, () => {
             this.resetViewport()
         })
         
         this.init()
-    }
-    
-    resetViewport() {
-        if (this.target === undefined)
-            this.gl.viewport(0, 0, this.viewport.width, this.viewport.height)
-    }
-    
-    setTarget(texture, clear = false, layer = 0) {
-        this.target = texture
-        const gl = this.gl
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderFramebuffer)
-        texture.setFramebufferSlot(0, layer)
-        if (clear)
-            gl.clear(gl.COLOR_BUFFER_BIT)
-    }
-    
-    resetTarget() {
-        if (!this.target)
-            return
-        
-        delete this.target
-        
-        const gl = this.gl
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-        
-        this.resetViewport()
-    
     }
     
     init() {
@@ -66,25 +41,48 @@ export default class GLRenderer {
         this.resetViewport()
     }
     
+    getViewport() {
+        return this.viewport
+    }
+    
+    resetViewport() {
+        if (this.target === undefined)
+            this.gl.viewport(0, 0, this.viewport.width, this.viewport.height)
+    }
+    
+    setTarget(texture, clearColor = null, layer = 0) {
+        this.target = texture
+        const gl = this.gl
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.renderFramebuffer)
+        
+        texture.setFramebufferSlot(0, layer)
+        if (clearColor !== null) {
+            gl.clearColor(...clearColor)
+            gl.clear(gl.COLOR_BUFFER_BIT)
+        }
+    }
+    
+    resetTarget() {
+        if (!this.target)
+            return
+        
+        delete this.target
+        
+        const gl = this.gl
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+        
+        this.resetViewport()
+    
+    }
+    
     setScene(scene) {
+        this.scene?.deactivate()
         this.scene = scene
-    
-        this.scene.setView(this.view)
+        this.scene?.activate()
     }
     
-    setView(view) {
-        this.view = view
-    
-        this.scene?.setView(this.view)
-    
-        this.viewTrigger?.cancel()
-        this.viewTrigger = Trigger.on(this.view.events.change, () => {
-            this.scene.updateView(this.view)
-        })
-    }
-
     activate() {
-        if (this.active || !this.scene || !this.view)
+        if (this.active || !this.scene)
             return
         
         this.active = true
@@ -108,7 +106,7 @@ export default class GLRenderer {
     }
     
     frame(now) {
-        if (this.view === undefined || this.scene === undefined || !this.active) {
+        if (this.scene === undefined || !this.active) {
             return this.deactivate()
         }
     
@@ -131,13 +129,13 @@ export default class GLRenderer {
         const deltaTime = now - (this.then ?? now)
         this.then = now
     
-        this.view.advance(deltaTime)
     
         const gl = this.gl
     
         gl.clearColor(0.0, 0.0, 0.0, 0.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
     
+        this.scene.view.advance(deltaTime)
         this.scene.render(now)
     
         gl.bindVertexArray(null)

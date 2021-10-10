@@ -14,7 +14,8 @@ export default class GLAttribute {
         gl.enableVertexAttribArray(this.address)
     
         this.setPointer(
-            options.normalized ?? false,
+            options.normalize ?? this.type,
+            options.normalize !== undefined,
             options.offset ?? 0,
             options.stride ?? 0)
     
@@ -42,6 +43,6 @@ export default class GLAttribute {
         const address = gl.getAttribLocation(program, this.name)
         this.address = address
     
-        this.setPointer = gl[type.attributePointerSetter]?.bind(gl, address, type.size, type.type)
+        this.setPointer = gl[type.attributePointerSetter]?.bind(gl, address, type.size)
     }
 }
