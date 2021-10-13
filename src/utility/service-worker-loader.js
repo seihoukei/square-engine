@@ -1,3 +1,6 @@
+//this assumes engine's service-worker.js is put along index.html and has
+// message = true
+
 window.registerServiceWorker = (url = "./service-worker.js", scope = "./") => {
     return navigator.serviceWorker.register(url, {scope})
 }

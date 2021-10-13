@@ -46,8 +46,8 @@ class SquareDev {
         }
     }
     
-    log(text = "") {
-        this.data.log = `${this.data.log.trim()}\n${String(text).trim()}`
+    log(...data) {
+        this.data.log = `${this.data.log.trim()}\n${data.join(", ").trim()}`
         this.data.log = `\n  ${this.data.log.trim().split("\n").map(x => x.trim()).slice(-this.maxLogLength).join("\n  ")}`
         this.updateDisplay()
     }
