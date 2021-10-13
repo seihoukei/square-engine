@@ -184,4 +184,8 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
         
         this.events.updateView(this.viewData)
     }
+    
+    advanceView(time) {
+        this.view.advance(time)
+    }
 }

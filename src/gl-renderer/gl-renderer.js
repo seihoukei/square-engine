@@ -128,14 +128,13 @@ export default class GLRenderer {
 
         const deltaTime = now - (this.then ?? now)
         this.then = now
-    
-    
+        
         const gl = this.gl
     
         gl.clearColor(0.0, 0.0, 0.0, 0.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
     
-        this.scene.view.advance(deltaTime)
+        this.scene.advanceView(deltaTime)
         this.scene.render(now)
     
         gl.bindVertexArray(null)
