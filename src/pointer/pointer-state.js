@@ -7,6 +7,7 @@ export default class PointerState {
         first  : "touch0",
         second : "touch1",
         third  : "touch2",
+        mouse  : "cursor",
     }
     
     static EVENT_ALIAS = {	//for touch / button event coupling

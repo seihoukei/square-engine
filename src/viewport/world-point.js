@@ -4,7 +4,7 @@ const DEFAULT_COORDINATES = {
 	changed : false,
 }
 
-export default class WorldPoint{
+export default class WorldPoint {
 	real = Object.assign({}, DEFAULT_COORDINATES)
 	world = Object.assign({}, DEFAULT_COORDINATES)
 	
@@ -17,6 +17,13 @@ export default class WorldPoint{
 			this.setReal(x, y)
 	}
 	
+	setView(view, updateWorld = true) {
+		this.view = view
+		
+		if (updateWorld)
+			this.setWorldFromReal()
+	}
+	
 	// stores real coordinates, and updates world coordinates if viewport is provided
 	setReal(x, y, both = this.view !== undefined) {
 		if (this.real.x !== x || this.real.y !== y) {
@@ -27,13 +34,18 @@ export default class WorldPoint{
 			this.real.changed = false
 		
 		if (both) {
-			this.setWorld(
-				this.view.getWorldX(x),
-				this.view.getWorldY(y),
-				false,
-			)
+			this.setWorldFromReal()
 		}
 		return this.real.changed
+	}
+	
+	setWorldFromReal() {
+		this.setWorld(
+			this.view?.getWorldX(this.real.x) ?? 0,
+			this.view?.getWorldY(this.real.y) ?? 0,
+			false,
+		)
+		
 	}
 	
 	// stores world coordinates, and updates real coordinates if viewport is provided
@@ -64,4 +76,3 @@ export default class WorldPoint{
 		return this.setReal(point.real.x, point.real.y)
 	}
 }
-	

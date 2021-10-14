@@ -3,7 +3,14 @@ import MouseInteraction from "./interactions/mouse-interaction.js"
 import TouchInteraction from "./interactions/touch-interaction.js"
 import KeyboardInteraction from "./interactions/keyboard-interaction.js"
 
-export default class Pointer {
+export default class Pointer extends Trigger.Class(["changeView"]) {
+    static DEFAULT_INTERACTIONS = {
+        mouse: MouseInteraction,
+        touch: TouchInteraction,
+        keyboard: KeyboardInteraction,
+    }
+    
+    interactions = {}
     activities = {}
     actions = {
         anchor : (input, ...inputList) => {
@@ -19,16 +26,17 @@ export default class Pointer {
         },
     }
     
-    constructor(viewport, interactions = [MouseInteraction, TouchInteraction, KeyboardInteraction]) {
+    constructor(viewport, interactions = Pointer.DEFAULT_INTERACTIONS) {
+        super()
         this.viewport = viewport
         this.viewData = {}
-        this.interactions = interactions.map(Interaction => new Interaction(this))
+        
+        for (let [name, InteractionClass] of Object.entries(interactions))
+            this.interactions[name] = new InteractionClass(this)
         this.registerEvents(viewport.canvas)
     }
     
     setView(view) {
-        this.view = view
-    
         if (this.view === view)
             return
     
@@ -38,6 +46,8 @@ export default class Pointer {
         this.viewTrigger = Trigger.on(this.view.events.change, () => {
             this.updateView(this.view)
         })
+        
+        this.events.changeView(this.view)
     }
     
     updateView(view) {
@@ -71,9 +81,19 @@ export default class Pointer {
     }
     
     registerEvents(element) {
-        for (let interaction of this.interactions)
+        for (let interaction of Object.values(this.interactions))
             interaction.registerEvents(element)
     }
+    
+    //events = list of events that will be tried until one with bound trigger is found, the rest are ignored
+    trigger(input, ...events) {
+/*
+        dev.report("pointer.trigger", events.join(", ") + " - " + JSON.stringify(input, (key, value) => {
+            if (key === "pointer" || key === "view" || key === "interaction")
+                return
+            return value
+        }, " "), "pointer.trigger.old")
+*/
+    }
+    
 }
-
-

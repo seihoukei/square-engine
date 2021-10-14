@@ -1,9 +1,15 @@
 import PointerInteraction from "../pointer-interaction.js"
+import TouchInput from "../inputs/touch-input.js"
 
 export default class TouchInteraction extends PointerInteraction {
+    static MAX_TOUCHES = 3
+    
     constructor(pointer) {
         super(pointer)
-        this.boundEventHandler = this.eventHandler.bind(this)
+
+        for (let i = 0; i < TouchInteraction.MAX_TOUCHES; i++) {
+            this.addIndexedInput("touch", i, TouchInput)
+        }
     }
     
     registerEvents(element) {
