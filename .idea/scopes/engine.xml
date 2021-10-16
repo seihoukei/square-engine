@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="engine" pattern="file[square-engine]:src/dev//*||file[square-engine]:src/gl-renderer//*||file[square-engine]:src/pointer//*||file[square-engine]:src/utility//*||file[square-engine]:src/viewport//*" />
+</component>
