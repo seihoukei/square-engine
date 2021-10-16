@@ -2,6 +2,7 @@ import WorldPoint from "../../viewport/world-point.js"
 import Trigger from "../../utility/trigger.js"
 
 export default function movableInput(baseClass) {
+	//noinspection JSPotentiallyInvalidUsageOfThis
 	return class extends baseClass {
 		anchored = false
 		current = new WorldPoint(0, 0, this.pointer.view)
@@ -19,12 +20,14 @@ export default function movableInput(baseClass) {
 		setAnchor() {
 			this.anchored = true
 			this.anchor.set(this.current)
+			dev.report("anchor", this.name)
 		}
 		
 		unsetAnchor() {
 			this.anchored = false
 			this.anchor.setReal(0, 0, false)
 			this.anchor.setWorld(0, 0, false)
+			dev.report("unanchor", this.name)
 		}
 		
 		move(x, y) {

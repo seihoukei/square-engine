@@ -37,6 +37,22 @@ export default class TouchInteraction extends PointerInteraction {
             const x = touch.pageX - this.element.offsetLeft
             const y = touch.pageY - this.element.offsetTop
             const id = touch.identifier
+            
+            const input = this.getInput("touch", id)
+            if (!input)
+                continue
+            
+            if (event.type === "touchmove" || event.type === "touchstart") {
+                input.move(x, y)
+            }
+
+            if (event.type === "touchstart") {
+                input.press()
+            }
+
+            if (event.type === "touchend" || event.type === "touchout" || event.type === "touchcancel" ) {
+                input.release()
+            }
     
             if (window.dev?.isVerbose("touch"))
                 dev.report(`touch${id}`, `${event.type}: ${x}, ${y}`, `touch${id}.before`)

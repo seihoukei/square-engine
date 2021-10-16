@@ -2,6 +2,7 @@ import Trigger from "../utility/trigger.js"
 import MouseInteraction from "./interactions/mouse-interaction.js"
 import TouchInteraction from "./interactions/touch-interaction.js"
 import KeyboardInteraction from "./interactions/keyboard-interaction.js"
+import PointerState from "./pointer-state.js"
 
 export default class Pointer extends Trigger.Class(["changeView"]) {
     static DEFAULT_INTERACTIONS = {
@@ -12,17 +13,26 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
     
     interactions = {}
     activities = {}
+    inputs = {}
+    alias = {}
+    
     actions = {
         anchor : (input, ...inputList) => {
-        
+            if (inputList.length === 0) {
+                input.setAnchor()
+            } else {
+                for (let [input] of inputList)
+                    this.getInput(input).setAnchor()
+            }
         },
         
         unanchor : (input, ...inputList) => {
-        
-        },
-        
-        set_state : (input, state, ...args) => {
-        
+            if (inputList.length === 0) {
+                input.unsetAnchor()
+            } else {
+                for (let [input] of inputList)
+                    this.getInput(input).unsetAnchor()
+            }
         },
     }
     
@@ -58,19 +68,24 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
     addActivity(activity, name = activity.name) {
         if (name === undefined)
             throw Error("can't register activity without a name")
-        activity.register()
+        activity.register(this)
         this.activities[name] = activity
         return this
     }
     
     addAction(name, func) {
-        this.actions[name] = func
+        this.actions[name] = func.bind(this)
         return this
     }
     
     addActions(actions) {
-        Object.assign(this.actions, actions)
+        for (let [name, func] of Object.entries(actions))
+            this.addAction(name, func)
         return this
+    }
+    
+    addInput(input) {
+        this.inputs[input.name] = input
     }
     
     setActivity(name, state) {
@@ -87,13 +102,13 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
     
     //events = list of events that will be tried until one with bound trigger is found, the rest are ignored
     trigger(input, ...events) {
-/*
-        dev.report("pointer.trigger", events.join(", ") + " - " + JSON.stringify(input, (key, value) => {
-            if (key === "pointer" || key === "view" || key === "interaction")
-                return
-            return value
-        }, " "), "pointer.trigger.old")
-*/
+        for (let event of events) {
+            if (this.activity.trigger(input, event))
+                return true
+        }
     }
-    
+
+    getInput(name) {
+        return this.inputs[PointerState.INTERACTION_ALIAS[name] ?? name]
+    }
 }

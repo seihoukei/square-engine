@@ -6,8 +6,7 @@ import GLSceneElement from "../src/gl-renderer/gl-scene-element.js"
 import Web from "../src/utility/web.js"
 import Pointer from "../src/pointer/pointer.js"
 import PointerActivity from "../src/pointer/pointer-activity.js"
-import Viewport from "../src/viewport/viewport.js"
-import WorldView from "../src/viewport/world-view.js"
+import GLRenderer from "../src/gl-renderer/gl-renderer.js"
 
 const SOURCES = {
     nodes : "./shaders/nodes",
@@ -71,38 +70,54 @@ class MapActivity extends PointerActivity {
 
     build() {
         this.addAction("target", (input, cellNext, emptyNext) => {
-            console.log("target", input, cellNext, emptyNext)
+//            console.log("target", input, cellNext, emptyNext)
+            return emptyNext
         })
         
         this.addActions({
             cell_action : (input) => {
-                console.log("cell", input)
+//                console.log("cell", input)
             },
             
             cell_special_action : (input) => {
-                console.log("cell_special", input)
+//                console.log("cell_special", input)
             },
     
             empty_action : (input) => {
-                console.log("cell", input)
+//                console.log("empty", input)
             },
     
             empty_space_special_action : (input) => {
-                console.log("empty_special", input)
+//                console.log("empty_special", input)
             },
             
         })
         
         this.addActions({
-            drag_view : (input) => {
-            
+    
+            drag_view(input) {
+                this.view.moveWorldPoint(
+                    input.anchor.world.x, input.anchor.world.y,
+                    input.current.real.x, input.current.real.y)
             },
-            pinch_view : (input) => {
-            
+    
+            zoom_view(input) {
+                const mouse = this.getInput("mouse")
+                
+                this.view.zoomAt(mouse.current.world.x, mouse.current.world.y, - input.change / 10 * this.view.current.zoom)
             },
-            zoom_view : (input) => {
-            
+    
+            pinch_view(input) {
+                const first = this.getInput("first")
+                const second = this.getInput("second")
+
+                this.view.moveWorldPoints(
+                    first.anchor.world.x, first.anchor.world.y,
+                    second.anchor.world.x, second.anchor.world.y,
+                    first.current.real.x, first.current.real.y,
+                    second.current.real.x, second.current.real.y)
             },
+    
         })
         
         this.addStateTemplate("Browsable", `
@@ -130,7 +145,7 @@ class MapActivity extends PointerActivity {
             #DragView {
                 mouse first second.move_real = drag_view
                 first second.down = anchor(first, second) >PinchView
-                mouse first second.up = $1
+                lmb first second.up = $1
             
                 #PinchView {
                     first second.move_real = pinch_view
@@ -180,6 +195,7 @@ window.onload = async () => {
     const holder = DOM.createDiv(grid, "main-container")
     const canvas = DOM.createElement("canvas", "main", holder)
     
+/*
     const viewport = new Viewport(canvas)
     window.view = new WorldView(viewport)
     const pointer = new Pointer(viewport)
@@ -191,7 +207,7 @@ window.onload = async () => {
     window.pointer = pointer
 
     requestAnimationFrame(frame)
-/*
+*/
     // renderer
     const renderer = new GLRenderer(canvas, {
         sources: shaders,
@@ -204,7 +220,7 @@ window.onload = async () => {
     })
     
     const pointer = new Pointer(renderer.viewport)
-        .addActivity(new BrowseActivity())
+        .addActivity(new MapActivity())
         
     pointer.setView(scene.view)
     pointer.setActivity("Map")
@@ -294,7 +310,8 @@ window.onload = async () => {
         Trigger.on(scene.view.events.change, logView)
     }
 
-    window.renderer = renderer*/
+    window.renderer = renderer
+    window.pointer = pointer
 }
 
 function frame() {

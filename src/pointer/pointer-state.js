@@ -27,6 +27,7 @@ export default class PointerState {
     
     addSubstate(state) {
         this.states[state.name] = state
+        state.setParent(this)
     }
     
     addEntry(entry) {
@@ -39,5 +40,29 @@ export default class PointerState {
                 }`] = entry.actions
             }
         }
+    }
+    
+    getSubstate(name) {
+        return this.states[name] ?? this.parent?.getSubstate(name)
+    }
+    
+    getTrigger(trigger) {
+        return this.triggers[trigger]
+    }
+    
+    setLast(state) {
+        this.lastState = state
+    }
+    
+    getLast() {
+        return this.lastState
+    }
+    
+    setParent(state) {
+        this.parent = state
+    }
+    
+    getParent() {
+        return this.parent
     }
 }

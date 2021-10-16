@@ -6,6 +6,11 @@ export default class PointerStateCompiler {
         return this.state(this.tokenize(source))
     }
     
+    static compileActions(source) {
+        this.templates = {}
+        return this.actions(this.tokenize(source))
+    }
+    
     static tokenize(source) {
         return source
             .replace(/([=#>%{}\[\](),."^\n])/gm, " $1 ")
@@ -18,6 +23,11 @@ export default class PointerStateCompiler {
     
     static state(tokens) {
         const state = new PointerState()
+        state.setParent(this.currentState)
+        
+        const lastState = this.currentState
+        this.currentState = state
+        
         while (tokens.length) {
             const token = tokens.pop()
             if (token === "%") {
@@ -25,7 +35,7 @@ export default class PointerStateCompiler {
                 continue
             }
             if (token === "}") {
-                return state
+                break
             }
             if (token === "/*") {
                 this.comment(tokens, "*/")
@@ -47,6 +57,7 @@ export default class PointerStateCompiler {
             const entry = this.entry(tokens)
             state.addEntry(entry)
         }
+        this.currentState = lastState
         return state
     }
     
