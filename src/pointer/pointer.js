@@ -88,10 +88,13 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
         this.inputs[input.name] = input
     }
     
-    setActivity(name, state) {
-        this.activity = this.activities[name]
-        if (!this.activity)
+    setActivity(activity, state) {
+        if (typeof activity === "string")
+            activity = this.activities[activity]
+        if (!activity)
             throw new Error(`Unknown activity ${name}`)
+        
+        this.activity = activity
         this.activity.setState(state ?? this.activity.defaultState)
     }
     
