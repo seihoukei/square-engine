@@ -3,6 +3,7 @@ import TouchInput from "../inputs/touch-input.js"
 
 export default class TouchInteraction extends PointerInteraction {
     static MAX_TOUCHES = 3
+    static THRESHOLD = 20
     
     constructor(pointer) {
         super(pointer)
@@ -32,10 +33,12 @@ export default class TouchInteraction extends PointerInteraction {
     
         event.preventDefault()
         event.stopPropagation()
-    
+
+        const rect = this.element.getBoundingClientRect()
+        
         for (let touch of event.changedTouches) {
-            const x = touch.pageX - this.element.offsetLeft
-            const y = touch.pageY - this.element.offsetTop
+            const x = touch.pageX - rect.x
+            const y = touch.pageY - rect.y
             const id = touch.identifier
             
             const input = this.getInput("touch", id)
@@ -48,6 +51,7 @@ export default class TouchInteraction extends PointerInteraction {
 
             if (event.type === "touchstart") {
                 input.press()
+                input.threshold(TouchInteraction.THRESHOLD)
             }
 
             if (event.type === "touchend" || event.type === "touchout" || event.type === "touchcancel" ) {

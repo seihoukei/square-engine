@@ -20,6 +20,7 @@ export default class PointerState {
     
     states = {}
     triggers = {}
+    idleTriggers = []
     name
     
     constructor () {
@@ -33,17 +34,35 @@ export default class PointerState {
     addEntry(entry) {
         for (let event of entry.events) {
             for (let interaction of event.interactions) {
-                this.triggers[`${
-                    PointerState.INTERACTION_ALIAS[interaction] ?? interaction
-                }.${
-                    PointerState.EVENT_ALIAS[event.event] ?? event.event
-                }`] = entry.actions
+                if (interaction === "idle") {
+                    this.addIdle(Number(event.event), entry.actions)
+                    continue
+                }
+                this.addTrigger(interaction, event.event, entry.actions)
             }
         }
     }
     
+    addIdle(duration, actions) {
+        this.idleTriggers.push({
+            duration, actions
+        })
+    }
+    
+    getIdles() {
+        return this.idleTriggers
+    }
+    
     getSubstate(name) {
         return this.states[name] ?? this.parent?.getSubstate(name)
+    }
+    
+    addTrigger(interaction, event, actions) {
+        this.triggers[`${
+            PointerState.INTERACTION_ALIAS[interaction] ?? interaction
+        }.${
+            PointerState.EVENT_ALIAS[event.event] ?? event
+        }`] = actions
     }
     
     getTrigger(trigger) {

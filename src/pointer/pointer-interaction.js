@@ -17,6 +17,8 @@ export default class PointerInteraction {
         this.inputs[name] = input
 
         this.pointer.addInput(input)
+        
+        return input
     }
     
     addIndexedInput(name, index, InputClass) {
@@ -28,6 +30,8 @@ export default class PointerInteraction {
         this.inputs[name][index] = input
         
         this.pointer.addInput(input)
+        
+        return input
     }
     
     getInput(name, index) {

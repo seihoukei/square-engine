@@ -5,15 +5,20 @@ import MouseWheelInput from "../inputs/mouse-wheel-input.js"
 
 export default class MouseInteraction extends PointerInteraction {
     static MAX_BUTTONS = 3
+    static THRESHOLD = 5
     
     constructor(pointer) {
         super(pointer)
         
-        this.addInput("cursor", MouseCursorInput)
+        const cursor = this.addInput("cursor", MouseCursorInput)
+        
         for (let i = 0; i < MouseInteraction.MAX_BUTTONS; i++) {
             this.addIndexedInput("button", i, MouseButtonInput)
+                .setCursor(cursor)
+            
         }
         this.addInput("wheel", MouseWheelInput)
+            .setCursor(cursor)
     }
     
     registerEvents(element) {
@@ -75,6 +80,9 @@ export default class MouseInteraction extends PointerInteraction {
         if (event.type === "mousedown") {
             const input = this.getInput("button", button)
             input.press()
+            
+            const cursor = this.getInput("cursor")
+            cursor.threshold(MouseInteraction.THRESHOLD)
             
             return
         }

@@ -1,6 +1,7 @@
 export default function pressableInput(baseClass) {
 	return class extends baseClass {
 		down = false
+		pressable = true
 		
 		press() {
 			if (this.down)

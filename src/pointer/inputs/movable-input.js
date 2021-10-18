@@ -4,33 +4,30 @@ import Trigger from "../../utility/trigger.js"
 export default function movableInput(baseClass) {
 	//noinspection JSPotentiallyInvalidUsageOfThis
 	return class extends baseClass {
-		anchored = false
 		current = new WorldPoint(0, 0, this.pointer.view)
-		anchor = new WorldPoint(0, 0, this.pointer.view)
+		positionable = true
+		thresholdValue = 0
+		thresholdPosition = {
+			x : 0,
+			y : 0,
+		}
 		
 		constructor(...args) {
 			super(...args)
 			Trigger.on(this.pointer.events.changeView, (view) => {
 				this.current.setView(view)
-				this.anchor.setView(view, this.anchored)
 			})
 			
 		}
 		
-		setAnchor() {
-			this.anchored = true
-			this.anchor.set(this.current)
-			dev.report("anchor", this.name)
-		}
-		
-		unsetAnchor() {
-			this.anchored = false
-			this.anchor.setReal(0, 0, false)
-			this.anchor.setWorld(0, 0, false)
-			dev.report("unanchor", this.name)
-		}
-		
 		move(x, y) {
+			if (this.thresholdValue > 0) {
+				const shift = Math.hypot(x - this.thresholdPosition.x, y - this.thresholdPosition.y)
+				if (shift < this.thresholdValue)
+					return
+				this.threshold(0)
+			}
+			
 			this.current.setReal(x, y)
 			const events = []
 			
@@ -43,6 +40,27 @@ export default function movableInput(baseClass) {
 			
 			if (events.length > 0)
 				this.pointer.trigger(this, ...events)
+		}
+		
+		getRealPosition(container = {}) {
+			container.x = this.current.real.x
+			container.y = this.current.real.y
+			return container
+		}
+		
+		getWorldPosition(container = {}) {
+			container.x = this.current.world.x
+			container.y = this.current.world.y
+			return container
+		}
+		
+		setCursor() {
+			throw new Error ("Can't set cursor of movable input")
+		}
+		
+		threshold(value = 20) {
+			this.thresholdValue = value
+			this.getRealPosition(this.thresholdPosition)
 		}
 	}
 }

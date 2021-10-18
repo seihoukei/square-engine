@@ -28,17 +28,7 @@ export default class PointerActivity {
             this.addAction(name, func)
         return this
     }
-    
-    addGlobalAction(name, func) {
-        this.pointer.addAction(name, func)
-        return this
-    }
-    
-    addGlobalActions(actions) {
-        this.pointer.addActions(actions)
-        return this
-    }
-    
+
     addState(name, source) {
         const state = PointerStateCompiler.compile(source, this.stateTemplates)
         state.name = name
@@ -57,8 +47,12 @@ export default class PointerActivity {
         if (!state)
             throw new Error ("Unknown state")
         
+        this.resetIdles()
+        
         state.setLast(this.state)
         this.state = state
+        
+        this.initIdles()
     }
     
     getState(name) {
@@ -66,10 +60,35 @@ export default class PointerActivity {
     }
     
     getAction(name) {
-        return this.actions[name] ?? this.pointer.actions[name]
+        return this.actions[name]
+    }
+    
+    initIdles() {
+        if (this.state === undefined)
+            return
+        for (let trigger of this.state.getIdles()) {
+            if (trigger.timeout !== undefined)
+                clearTimeout(trigger.timeout)
+        
+            trigger.timeout = setTimeout(() => this.executeChain(this.lastInput, ...trigger.actions), trigger.duration)
+        }
+    }
+    
+    resetIdles() {
+        if (this.state === undefined)
+            return
+        for (let trigger of this.state.idleTriggers) {
+            if (trigger.timeout !== undefined)
+                clearTimeout(trigger.timeout)
+        
+            delete trigger.timeout
+        }
     }
     
     trigger(input, event) {
+        this.lastInput = input
+        this.initIdles()
+        
         const trigger = this.state?.getTrigger(event)
         if (!trigger) return false
         

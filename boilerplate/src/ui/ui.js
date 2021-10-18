@@ -25,6 +25,7 @@ export default class UI {
 			const scenario = {}
 			
 			scenario.scene = new scenarioData.scene(this.renderer, scenarioData.sceneSettings)
+			scenario.view = scenario.scene.view
 			scenario.activity = new scenarioData.activity()
 			this.pointer.addActivity(scenario.activity)
 			

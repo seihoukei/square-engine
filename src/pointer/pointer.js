@@ -14,27 +14,7 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
     interactions = {}
     activities = {}
     inputs = {}
-    alias = {}
-    
-    actions = {
-        anchor : (input, ...inputList) => {
-            if (inputList.length === 0) {
-                input.setAnchor()
-            } else {
-                for (let [input] of inputList)
-                    this.getInput(input).setAnchor()
-            }
-        },
-        
-        unanchor : (input, ...inputList) => {
-            if (inputList.length === 0) {
-                input.unsetAnchor()
-            } else {
-                for (let [input] of inputList)
-                    this.getInput(input).unsetAnchor()
-            }
-        },
-    }
+    data = {}
     
     constructor(viewport, interactions = Pointer.DEFAULT_INTERACTIONS) {
         super()
@@ -73,17 +53,6 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
         return this
     }
     
-    addAction(name, func) {
-        this.actions[name] = func.bind(this)
-        return this
-    }
-    
-    addActions(actions) {
-        for (let [name, func] of Object.entries(actions))
-            this.addAction(name, func)
-        return this
-    }
-    
     addInput(input) {
         this.inputs[input.name] = input
     }
@@ -109,6 +78,7 @@ export default class Pointer extends Trigger.Class(["changeView"]) {
             if (this.activity.trigger(input, event))
                 return true
         }
+        return false
     }
 
     getInput(name) {

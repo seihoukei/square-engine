@@ -20,8 +20,8 @@ class SquareDev {
         this.verbose[name] = value
     }
     
-    report(name, content, oldName = "") {
-        if (oldName !== "" && this.data[name] !== undefined)
+    report(name, content, oldName = "", changeOnly = false) {
+        if (oldName !== "" && this.data[name] !== undefined && (!changeOnly || this.data[name] !== content))
             this.data[oldName] = this.data[name]
         this.data[name] = content
         this.updateDisplay()
