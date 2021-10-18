@@ -1,5 +1,6 @@
 import PointerStateCompiler from "./pointer-state-compiler.js"
 import PointerState from "./pointer-state.js"
+import PointerExecutionContext from "./pointer-execution-context.js"
 
 export default class PointerActivity {
     actions = {}
@@ -8,6 +9,8 @@ export default class PointerActivity {
     
     name
     defaultState = "Default"
+    
+    executionContext = new PointerExecutionContext()
     
     constructor() {
 //        this.pointer = pointer
@@ -18,8 +21,16 @@ export default class PointerActivity {
         this.build()
     }
     
+    setContext(surface) {
+        this.executionContext.getInput = surface.pointer.getInput.bind(this.pointer)
+        this.executionContext.scene = surface.renderer.scene
+        this.executionContext.renderer = surface.renderer
+        this.executionContext.pointer = surface.pointer
+        this.executionContext.scenario = surface.scenario
+    }
+    
     addAction(name, func) {
-        this.actions[name] = func.bind(this.pointer)
+        this.actions[name] = func.bind(this.executionContext)
         return this
     }
     

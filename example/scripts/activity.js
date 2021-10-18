@@ -45,7 +45,7 @@ export default class MapActivity extends PointerActivity {
 					Math.random() * 255 | 0,
 					255,
 				]
-				surface.renderer.scene.getBuffer("nodeColor").setInstanceData(this.data.node.index, this.data.node.color)
+				this.scene.getBuffer("nodeColor").setInstanceData(this.data.node.index, this.data.node.color)
 				
 				dev.report("action", "cell", "action.old", true)
 			},
@@ -68,7 +68,7 @@ export default class MapActivity extends PointerActivity {
 				this.data.lastWorld = input.getWorldPosition(this.data.lastWorld)
 				this.data.node.x = this.data.lastWorld.x - this.data.dragOffset.x
 				this.data.node.y = this.data.lastWorld.y - this.data.dragOffset.y
-				surface.renderer.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y)
+				this.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y)
 			
 				dev.report("action", "cell_drag", "action.old", true)
 			},
@@ -83,7 +83,7 @@ export default class MapActivity extends PointerActivity {
 				if (input.direction === "down" && this.data.node.size > 15)
 					this.data.node.size /= 1.05
 				
-				surface.renderer.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y, this.data.node.size)
+				this.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y, this.data.node.size)
 				
 			},
 			

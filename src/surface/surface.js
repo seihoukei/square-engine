@@ -22,6 +22,8 @@ export default class Surface {
 		this.pointer.setActivity(scenario.activity)
 		this.pointer.setView(scenario.view)
 		this.renderer.setScene(scenario.scene)
+		
+		scenario.activity.setContext(this)
 	}
 	
 	activate() {
