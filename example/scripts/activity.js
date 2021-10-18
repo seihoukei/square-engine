@@ -12,28 +12,39 @@ export default class MapActivity extends PointerActivity {
 			}
 			
 			if (this.data.lastWorld === undefined) {
-				dev.report("action", "target => fail", "action.old", true)
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "target => fail", "action.old", true)
 				return emptyNext
 			}
 			
 			const cursor = this.data.lastWorld
 			
-			dev.report("cursor", JSON.stringify(cursor))
+			if (window.dev?.isVerbose("action"))
+				dev.report("cursor", JSON.stringify(cursor))
 			
-			for (let node of this.scenario.nodes) {
-				if (Math.hypot(node.x - cursor.x, node.y - cursor.y) < node.size){
-					this.data.node = node
+			const node = this.scenario.searchRegions.findPointRegion(cursor.x, cursor.y)?.site
+			
+			if (node && this.scenario.regions.for(node)?.contains(cursor.x, cursor.y))
+				this.scenario.setActiveNode(node)
+			else
+				this.scenario.setActiveNode()
+			
+			if (node && Math.hypot(node.x - cursor.x, node.y - cursor.y) < node.size * 3) {
+				this.data.node = node
+				if (window.dev?.isVerbose("action")) {
 					dev.report("node", JSON.stringify(node, null, 1))
 					dev.report("action", "target => node", "action.old", true)
-					return cellNext
 				}
+				return cellNext
 			}
 			
 			delete this.data.node
-			dev.forget("node")
-			
-			dev.report("action", "target => empty", "action.old", true)
-//            console.log("target", input, cellNext, emptyNext)
+
+			if (window.dev?.isVerbose("action")) {
+				dev.forget("node")
+				dev.report("action", "target => empty", "action.old", true)
+			}
+
 			return emptyNext
 		})
 		
@@ -46,8 +57,10 @@ export default class MapActivity extends PointerActivity {
 					255,
 				]
 				this.scenario.updateNode(this.data.node)
+				this.scenario.updateRegionBuffers()
 				
-				dev.report("action", "cell", "action.old", true)
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "cell", "action.old", true)
 			},
 			
 			cell_start_drag(input) {
@@ -58,7 +71,9 @@ export default class MapActivity extends PointerActivity {
 				this.data.dragOffset ??= {}
 				this.data.dragOffset.x = this.data.lastWorld.x - this.data.node.x
 				this.data.dragOffset.y = this.data.lastWorld.y - this.data.node.y
-				dev.report("action", "cell_drag_start", "action.old", true)
+	
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "cell_drag_start", "action.old", true)
 			},
 			
 			cell_drag(input) {
@@ -69,8 +84,10 @@ export default class MapActivity extends PointerActivity {
 				this.data.node.x = this.data.lastWorld.x - this.data.dragOffset.x
 				this.data.node.y = this.data.lastWorld.y - this.data.dragOffset.y
 				this.scenario.updateNode(this.data.node)
-			
-				dev.report("action", "cell_drag", "action.old", true)
+				this.scenario.updateRegions()
+				
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "cell_drag", "action.old", true)
 			},
 			
 			cell_scale(input) {
@@ -84,19 +101,25 @@ export default class MapActivity extends PointerActivity {
 					this.data.node.size /= 1.05
 				
 				this.scenario.updateNode(this.data.node)
+				this.scenario.updateRegions()
 				
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "cell_scale", "action.old", true)
 			},
 			
 			cell_special_action(input) {
-				dev.report("action", "cell_special", "action.old", true)
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "cell_special", "action.old", true)
 			},
 			
 			empty_action(input) {
-				dev.report("action", "empty", "action.old", true)
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "empty", "action.old", true)
 			},
 			
 			empty_space_special_action(input) {
-				dev.report("action", "empty_special", "action.old", true)
+				if (window.dev?.isVerbose("action"))
+					dev.report("action", "empty_special", "action.old", true)
 			},
 			
 		})

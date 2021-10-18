@@ -9,7 +9,10 @@ const SOURCES = {
     nodes : "./shaders/nodes",
     bg : "./shaders/bg",
     bg_nodes : "./shaders/bg_nodes",
+    regions : "./shaders/regions"
 }
+
+const NODE_COUNT = 256
 
 window.onload = async () => {
     const shaders = await Web.loadShaders(SOURCES)
@@ -33,7 +36,9 @@ window.onload = async () => {
     surface.setScenario("map")
     surface.activate()
     
-    surface.scenarios.map.createNodes(32)
+    surface.scenarios.map.createNodes(NODE_COUNT)
+    
+    surface.scenarios.map.view.setZoom(0.25)
     
 //    window.surface = surface
 }

@@ -11,12 +11,13 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     textures = {}
     renderQueue = []
     
-    constructor(renderer, settings = {}) {
+    constructor(renderer, data = {}) {
         super()
         
         this.renderer = renderer
+        this.pointer = data.pointer
         
-        this.setView(new WorldView(renderer.getViewport(), settings.viewSettings))
+        this.setView(new WorldView(renderer.getViewport(), data.viewSettings))
         
         this.build()
         this.init()
@@ -132,6 +133,10 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
         
         for (let {element} of this.renderQueue) {
             element.setSpecialUniformData("now", now)
+            if (this.pointer?.activity?.lastInput?.getWorldPosition !== undefined) {
+                this.cursorPosition = this.pointer.activity.lastInput.getWorldPosition(this.cursorPosition)
+                element.setSpecialUniformData("cursor", [this.cursorPosition.x, this.cursorPosition.y])
+            }
             element.render()
         }
     }

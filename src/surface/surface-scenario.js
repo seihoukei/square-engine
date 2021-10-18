@@ -6,7 +6,8 @@ export default class SurfaceScenario {
 	
 	constructor(renderer, pointer, data = {}) {
 		this.scene = new this.constructor.sceneClass(renderer, Object.assign({}, this.constructor.sceneSettings, {
-			viewSettings: this.constructor.viewSettings
+			viewSettings: this.constructor.viewSettings,
+			pointer,
 		}))
 		
 		this.activity = new this.constructor.activityClass()

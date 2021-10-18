@@ -128,11 +128,11 @@ export default class Circle {
         )
     }
 
-    enclose (points, addRadius, fixedPoints = []) {
+    enclose (points, addRadius, fixedPoints = []) { //addRadius broken!
         if (fixedPoints.length === 3) {
             this.toThreePoints(...fixedPoints)
             if (addRadius) {
-                this.addedRadius = Math.max(...fixedPoints.map(x => x.radius))
+                this.addedRadius = Math.max(...fixedPoints.map(x => x[addRadius]))
                 this.radius += this.addedRadius
             }
             return this

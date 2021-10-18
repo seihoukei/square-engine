@@ -14,6 +14,7 @@ out vec4 color;
 
 highp float random(vec2 position, float shift) {
     //    position.y += position.x / 2.0;
+    shift *= v_distortion_scale;
     position.y += shift * 0.5;
     position.x -= shift;
     position = round(position * 5.0) / 5.0;
