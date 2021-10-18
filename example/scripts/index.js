@@ -33,7 +33,7 @@ window.onload = async () => {
     surface.setScenario("map")
     surface.activate()
     
-    window.surface = surface
-    
     surface.scenarios.map.createNodes(32)
+    
+//    window.surface = surface
 }

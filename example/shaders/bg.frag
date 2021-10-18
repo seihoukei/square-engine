@@ -12,7 +12,7 @@ uniform float u_front;
 
 out vec4 color;
 
-float random(vec2 position, float shift) {
+highp float random(vec2 position, float shift) {
     //    position.y += position.x / 2.0;
     position.y += shift * 0.5;
     position.x -= shift;
@@ -20,7 +20,7 @@ float random(vec2 position, float shift) {
     return fract(sin(position.x) * 10000.0 + sin(position.y) * 1000.0);
 }
 
-float stars(vec2 position, float shift, float rate) {
+highp float stars(vec2 position, float shift, float rate) {
     float noise = random(position, shift);
     noise = (pow(noise, 10.0) - 1.0 + rate) / rate;
     if (noise < 0.0) noise = 0.0;
@@ -31,7 +31,7 @@ void main() {
     vec2 grid_position = v_grid_position;
 
     color = vec4(0.0,0,0,1);
-    float noise = 0.0;
+    highp float noise = 0.0;
     if (u_front == 1.0) {
         noise += stars(grid_position / 4.0, 300.0 + u_now / 100.0, 0.001);
         noise += stars(grid_position / 3.5, 200.0 + u_now / 200.0, 0.002);
