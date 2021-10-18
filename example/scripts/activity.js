@@ -20,7 +20,7 @@ export default class MapActivity extends PointerActivity {
 			
 			dev.report("cursor", JSON.stringify(cursor))
 			
-			for (let node of nodes) {
+			for (let node of this.scenario.nodes) {
 				if (Math.hypot(node.x - cursor.x, node.y - cursor.y) < node.size){
 					this.data.node = node
 					dev.report("node", JSON.stringify(node, null, 1))
@@ -45,7 +45,7 @@ export default class MapActivity extends PointerActivity {
 					Math.random() * 255 | 0,
 					255,
 				]
-				this.scene.getBuffer("nodeColor").setInstanceData(this.data.node.index, this.data.node.color)
+				this.scenario.updateNode(this.data.node)
 				
 				dev.report("action", "cell", "action.old", true)
 			},
@@ -68,7 +68,7 @@ export default class MapActivity extends PointerActivity {
 				this.data.lastWorld = input.getWorldPosition(this.data.lastWorld)
 				this.data.node.x = this.data.lastWorld.x - this.data.dragOffset.x
 				this.data.node.y = this.data.lastWorld.y - this.data.dragOffset.y
-				this.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y)
+				this.scenario.updateNode(this.data.node)
 			
 				dev.report("action", "cell_drag", "action.old", true)
 			},
@@ -83,7 +83,7 @@ export default class MapActivity extends PointerActivity {
 				if (input.direction === "down" && this.data.node.size > 15)
 					this.data.node.size /= 1.05
 				
-				this.scene.getBuffer("nodeData").setInstanceData(this.data.node.index, this.data.node.x, this.data.node.y, this.data.node.size)
+				this.scenario.updateNode(this.data.node)
 				
 			},
 			

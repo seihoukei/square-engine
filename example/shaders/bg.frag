@@ -4,6 +4,7 @@ precision mediump float;
 
 in vec2 v_grid_position;
 in vec2 v_position;
+flat in float v_distortion_scale;
 
 uniform highp float u_now;
 uniform sampler2D u_bg_nodes;
@@ -27,9 +28,7 @@ float stars(vec2 position, float shift, float rate) {
 }
 
 void main() {
-    vec4 distortion = texture(u_bg_nodes, v_position * 0.5 + 0.5);
-    vec2 grid_position = (v_grid_position / 100.0 * 3.1415926535898 * 2.0);
-    vec2 distorted_grid_position = grid_position + (distortion.xy - 0.5) * 6.0;
+    vec2 grid_position = v_grid_position;
 
     color = vec4(0.0,0,0,1);
     float noise = 0.0;
@@ -39,16 +38,18 @@ void main() {
         noise += stars(grid_position / 3.0, 150.0 + u_now / 300.0, 0.003);
         noise += stars(grid_position / 2.5, 100.0 + u_now / 400.0, 0.004);
         if (noise <= 0.0)
-        discard;
+            discard;
     } else {
+        vec4 distortion = texture(u_bg_nodes, v_position * 0.5 + 0.5);
+        vec2 distorted_grid_position = grid_position + (distortion.xy - 0.5) * 6.0 * v_distortion_scale;
         //        color += distortion;
         noise += stars(distorted_grid_position / 2.5, 100.0 - u_now / 400.0, 0.007);
         noise += stars(distorted_grid_position / 2.0, 150.0 - u_now / 300.0, 0.008);
         noise += stars(distorted_grid_position / 1.5, 200.0 - u_now / 200.0, 0.009);
         noise += stars(distorted_grid_position / 1.0, 300.0 - u_now / 100.0, 0.010);
         if (noise <= 0.0)
+            discard;
         //            return;
-        discard;
     }
     float power = noise;
     float red = fract(noise * 10.0);

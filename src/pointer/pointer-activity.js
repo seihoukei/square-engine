@@ -24,6 +24,7 @@ export default class PointerActivity {
     setContext(surface) {
         this.executionContext.getInput = surface.pointer.getInput.bind(this.pointer)
         this.executionContext.scene = surface.renderer.scene
+        this.executionContext.view = surface.renderer.scene.view
         this.executionContext.renderer = surface.renderer
         this.executionContext.pointer = surface.pointer
         this.executionContext.scenario = surface.scenario

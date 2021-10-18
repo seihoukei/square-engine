@@ -19,6 +19,7 @@ export default class Surface {
 		if (!scenario)
 			throw new Error("Unknown scenario")
 		
+		this.scenario = scenario
 		this.pointer.setActivity(scenario.activity)
 		this.pointer.setView(scenario.view)
 		this.renderer.setScene(scenario.scene)

@@ -6,7 +6,7 @@ class BGElement extends GLSceneElement {
 		this.setAlpha(true)
 		this.setMaxLength(1)
 		this.useProgram("bg")
-		this.setViewUniforms("u_center", "u_size")
+		this.setViewUniforms("u_center", "u_size", "u_pixel")
 		this.setTimeUniform("u_now")
 		this.setPositionAttribute("a_position")
 		this.setTexture("u_bg_nodes", "bg_nodes")
