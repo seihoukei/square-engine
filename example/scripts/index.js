@@ -1,9 +1,9 @@
-import "../../src/dev/dev.js" //debug module
-import "../../src/utility/math.js"
-import DOM from "../../src/utility/dom.js"
-import Web from "../../src/utility/web.js"
+import "../../square-engine/dev/dev.js" //debug module
+import "../../square-engine/utility/math.js"
+import DOM from "../../square-engine/utility/dom.js"
+import Web from "../../square-engine/utility/web.js"
 import MapScenario from "./scenario.js"
-import Surface from "../../src/surface/surface.js"
+import Surface from "../../square-engine/surface/surface.js"
 
 const SOURCES = {
     nodes : "./shaders/nodes",

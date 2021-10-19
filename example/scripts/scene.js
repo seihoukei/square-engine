@@ -1,5 +1,5 @@
-import GLSceneElement from "../../src/gl-renderer/gl-scene-element.js"
-import GLScene from "../../src/gl-renderer/gl-scene.js"
+import GLSceneElement from "../../square-engine/gl-renderer/gl-scene-element.js"
+import GLScene from "../../square-engine/gl-renderer/gl-scene.js"
 
 const MAX_NODES = 1024
 const AVERAGE_REGION_EDGES = 8

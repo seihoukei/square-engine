@@ -1,4 +1,4 @@
-import PointerActivity from "../../src/pointer/pointer-activity.js"
+import PointerActivity from "../../square-engine/pointer/pointer-activity.js"
 
 export default class MapActivity extends PointerActivity {
 	name = "Map"
