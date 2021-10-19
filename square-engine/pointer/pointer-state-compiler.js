@@ -15,7 +15,7 @@ export default class PointerStateCompiler {
         return source
             .replace(/([=#>%{}\[\](),."^\n])/gm, " $1 ")
             .replace(/\\[ \t]*\n/gm, " ")
-            .replace(/ +/g, " ")
+            .replace(/[ \t]+/g, " ")
             .trim()
             .split(" ")
             .reverse()

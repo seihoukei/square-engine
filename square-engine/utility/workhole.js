@@ -138,7 +138,7 @@ export default class Workhole {
                 __workhole : true,
                 action : "result",
                 id : data.id,
-                result : object[data.command].call(object, ...data.args)
+                result : object[data.command]?.call?.(object, ...data.args)
             })
             return
         }

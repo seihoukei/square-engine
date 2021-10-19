@@ -134,6 +134,10 @@ export default class GLSceneElement {
 
         return this
     }
+    
+    getLength() {
+        return this.length
+    }
 
     setAlpha(value) {
         this.alpha = value

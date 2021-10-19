@@ -43,6 +43,15 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
         return element
     }
     
+    getElement(elementName) {
+        const element = this.elements[elementName]
+        if (!element) {
+            console.warn(`Element ${elementName} not found`)
+            return
+        }
+        return element
+    }
+    
     queueElement(element, order = this.renderQueue.length) {
         if (typeof element === "string")
             element = this.elements[element]
@@ -87,7 +96,7 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     getBuffer(name, type, length, options = {}) {
         if (this.buffers[name] !== undefined) {
             const buffer = this.buffers[name]
-            if (type !== undefined && buffer.type !== GLTypes.get(type).type)
+            if (type !== undefined && buffer.type !== (options.normalize ?? GLTypes.get(type).type))
                 throw new Error ("Buffer type collision")
             if (length !== undefined && buffer.length !== length)
                 console.warn("Buffer length mismatch")
@@ -131,12 +140,13 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
         for (let buffer of Object.values(this.buffers))
             buffer.update()
         
+        if (this.pointer?.activity?.lastInput?.getWorldPosition !== undefined)
+            this.cursorPosition = this.pointer.activity.lastInput.getWorldPosition(this.cursorPosition)
+        
         for (let {element} of this.renderQueue) {
             element.setSpecialUniformData("now", now)
-            if (this.pointer?.activity?.lastInput?.getWorldPosition !== undefined) {
-                this.cursorPosition = this.pointer.activity.lastInput.getWorldPosition(this.cursorPosition)
+            if (this.cursorPosition !== undefined)
                 element.setSpecialUniformData("cursor", [this.cursorPosition.x, this.cursorPosition.y])
-            }
             element.render()
         }
     }
@@ -160,12 +170,12 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     }
     
     setLength(elementName, length = 0) {
-        const element = this.elements[elementName]
-        if (!element) {
-            console.warn(`Element ${elementName} not found`)
-            return false
-        }
-        element.setLength(length)
+        const element = this.getElement(elementName)
+        element?.setLength(length)
+    }
+    
+    getLength(elementName) {
+        return this.getElement(elementName)?.getLength() ?? 0
     }
     
     activate() {

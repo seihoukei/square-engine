@@ -29,6 +29,8 @@ export default class GLBuffer {
         this.type = this.glData.type
         this.data = new this.glData.arrayType(this.size * this.length)
         
+        this.updateData()
+        
         this.initialized = true
     }
     

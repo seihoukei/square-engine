@@ -12,12 +12,26 @@ class SquareDev {
     }
     maxLogLength = 20
     
+    options = {}
+    
     isVerbose(name = "default") {
         return this.verbose[name] ?? this.verbose.default
     }
     
     setVerbose(name, value = 1) {
         this.verbose[name] = value
+    }
+    
+    setOption(name, value) {
+        this.options[name] = value
+    }
+    
+    getOption(name) {
+        return this.options[name]
+    }
+    
+    getOptions() {
+        return this.options
     }
     
     report(name, content, oldName = "", changeOnly = false) {
@@ -64,4 +78,5 @@ class SquareDev {
 
 addEventListener("load", () => {
     window.dev = new SquareDev()
+    window.devOptions = dev.options
 })
