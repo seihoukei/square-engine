@@ -1,4 +1,4 @@
-import Serializer from "../square-engine/utility/serializer.js"
+import Serializer from "../../square-engine/utility/serializer.js"
 
 /*
 const data = {

@@ -7,7 +7,7 @@ export default class SquareSurface {
 	scenarios = {}
 	
 	constructor(canvas, data) {
-		this.renderer = new SquareGL(canvas, data)
+		this.renderer = new (data.rendererClass ?? SquareGL)(canvas, data)
 		this.pointer = new SquarePointer(this.renderer.viewport, data.interactions)
 		
 		for (let [name, ScenarioClass] of Object.entries(data.scenarios)) {

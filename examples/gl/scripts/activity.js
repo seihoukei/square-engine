@@ -1,4 +1,4 @@
-import SquarePointer from "../../square-engine/pointer/square-pointer.js"
+import SquarePointer from "../../../square-engine/pointer/square-pointer.js"
 
 export default class MapActivity extends SquarePointer.Activity {
 	name = "Map"

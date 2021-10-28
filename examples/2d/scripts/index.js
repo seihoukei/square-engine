@@ -1,22 +1,13 @@
-import "../../square-engine/dev/dev.js" //debug module
-import "../../square-engine/utility/math.js"
-import DOM from "../../square-engine/utility/dom.js"
-import Web from "../../square-engine/utility/web.js"
+import "../../../square-engine/dev/dev.js" //debug module
+import "../../../square-engine/utility/math.js"
+import DOM from "../../../square-engine/utility/dom.js"
 import MapScenario from "./scenario.js"
-import SquareSurface from "../../square-engine/surface/square-surface.js"
-
-const SOURCES = {
-    nodes : "./shaders/nodes",
-    bg : "./shaders/bg",
-    bg_nodes : "./shaders/bg_nodes",
-    regions : "./shaders/regions"
-}
+import SquareSurface from "../../../square-engine/surface/square-surface.js"
+import Square2D from "../../../square-engine/2d/square-2d.js"
 
 const NODE_COUNT = 256
 
 window.onload = async () => {
-    const shaders = await Web.loadShaders(SOURCES)
-    
     window.stopServiceWorkerLoader?.()
     document.getElementById("loader").remove()
     
@@ -26,7 +17,7 @@ window.onload = async () => {
     const canvas = DOM.createElement("canvas", "main", holder)
     
     const surface = new SquareSurface(canvas, {
-        sources: shaders,
+        rendererClass : Square2D,
         
         scenarios: {
             map : MapScenario

@@ -1,4 +1,4 @@
-import SquareGL from "../../square-engine/gl/square-gl.js"
+import SquareGL from "../../../square-engine/gl/square-gl.js"
 
 const MAX_NODES = 1024
 const AVERAGE_REGION_EDGES = 8

@@ -1,10 +1,10 @@
-import TestGLScene from "./scene.js"
+import Test2DScene from "./scene.js"
 import MapActivity from "./activity.js"
-import Geometry from "../../square-engine/geometry/geometry.js"
-import SquareSurface from "../../square-engine/surface/square-surface.js"
+import Geometry from "../../../square-engine/geometry/geometry.js"
+import SquareSurface from "../../../square-engine/surface/square-surface.js"
 
 export default class MapScenario extends SquareSurface.Scenario {
-	static sceneClass = TestGLScene
+	static sceneClass = Test2DScene
 	static activityClass = MapActivity
 	static viewSettings = {
 		expandView: 200,
@@ -25,12 +25,11 @@ export default class MapScenario extends SquareSurface.Scenario {
 				x : distance * Math.cos(angle),
 				y : distance * Math.sin(angle),
 				size,
-				color: [
+				color: `rgb(${[
 					Math.random() * 255 | 0,
 					Math.random() * 255 | 0,
 					Math.random() * 255 | 0,
-					255,
-				]
+				].join(",")}`
 			}
 			
 			nodes.push(node)
@@ -44,21 +43,13 @@ export default class MapScenario extends SquareSurface.Scenario {
 		this.nodes = nodes
 		
 		this.updateBoundaries()
-		this.updateNodes()
+		this.updateNodesData()
 		this.updateRegions()
 	}
 	
-	updateNodes() {
-		const dataBuffer = this.scene.getBuffer("nodeData")
-		const colorBuffer = this.scene.getBuffer("nodeColor")
-		
-		for (let node of this.nodes) {
-			dataBuffer.setInstanceData(node.index, node.x, node.y, node.size, node.index)
-			colorBuffer.setInstanceData(node.index, node.color)
-		}
-
-		this.scene.setLength("nodes", this.nodes.length)
-		this.scene.setLength("bg_nodes", this.nodes.length)
+	updateNodesData() {
+		this.scene.elements.nodes.data.nodes = this.nodes
+		this.scene.elements.nodes.data.activeNode = this.activeNode
 	}
 	
 	updateBoundaries() {
@@ -79,11 +70,6 @@ export default class MapScenario extends SquareSurface.Scenario {
 		this.scene.setBoundaries(bounds)
 	}
 	
-	updateNode(node) {
-		this.scene.getBuffer("nodeData").setInstanceData(node.index, node.x, node.y, node.size, node.index)
-		this.scene.getBuffer("nodeColor").setInstanceData(node.index, node.color)
-	}
-	
 	updateRegions() {
 		this.maxCircle = Geometry.Circle.enclosing(this.nodes, "size")
 		this.maxCircle.radius += 300
@@ -99,28 +85,12 @@ export default class MapScenario extends SquareSurface.Scenario {
 			region.shrinkTo(site.size * 10)
 		}
 		
-		const index = this.updateRegionBuffers()
-		
-		this.scene.setLength("regions", index)
+		this.updateRegionsData()
 	}
 
-	updateRegionBuffers() {
-		const nodeBuffer = this.scene.getBuffer("regionNode")
-		const edgeBuffer = this.scene.getBuffer("regionEdge")
-		const colorBuffer = this.scene.getBuffer("regionColor")
-		
-		let index = 0
-		for (let [site, region] of this.regions) {
-			for (let edge of region) {
-				nodeBuffer.setInstanceData(index, site.x, site.y, site === this.activeNode ? 1 : 0, 0)
-				edgeBuffer.setInstanceData(index, edge.startX, edge.startY, edge.endX, edge.endY)
-				colorBuffer.setInstanceData(index, site.color)
-				
-				index++
-			}
-		}
-		
-		return index
+	updateRegionsData() {
+		this.scene.elements.regions.data.regions = this.regions
+		this.scene.elements.regions.data.activeNode = this.activeNode
 	}
 	
 	setActiveNode(node) {
@@ -128,7 +98,8 @@ export default class MapScenario extends SquareSurface.Scenario {
 			return
 		
 		this.activeNode = node
-		
-		this.updateRegionBuffers()
+
+		this.updateRegionsData()
+		this.updateNodesData()
 	}
 }
