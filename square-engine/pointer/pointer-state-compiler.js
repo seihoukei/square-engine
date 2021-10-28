@@ -1,4 +1,4 @@
-import PointerState from "./pointer-state.js"
+import SquarePointer from "./square-pointer.js"
 
 export default class PointerStateCompiler {
     static compile(source, templates) {
@@ -22,7 +22,7 @@ export default class PointerStateCompiler {
     }
     
     static state(tokens) {
-        const state = new PointerState()
+        const state = new SquarePointer.State()
         state.setParent(this.currentState)
         
         const lastState = this.currentState

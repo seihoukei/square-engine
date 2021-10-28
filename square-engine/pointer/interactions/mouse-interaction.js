@@ -1,7 +1,5 @@
+import SquarePointer from "../square-pointer.js"
 import PointerInteraction from "../pointer-interaction.js"
-import MouseCursorInput from "../inputs/mouse-cursor-input.js"
-import MouseButtonInput from "../inputs/mouse-button-input.js"
-import MouseWheelInput from "../inputs/mouse-wheel-input.js"
 
 export default class MouseInteraction extends PointerInteraction {
     static MAX_BUTTONS = 3
@@ -10,14 +8,14 @@ export default class MouseInteraction extends PointerInteraction {
     constructor(pointer) {
         super(pointer)
         
-        const cursor = this.addInput("cursor", MouseCursorInput)
+        const cursor = this.addInput("cursor", SquarePointer.Inputs.MouseCursor)
         
         for (let i = 0; i < MouseInteraction.MAX_BUTTONS; i++) {
-            this.addIndexedInput("button", i, MouseButtonInput)
+            this.addIndexedInput("button", i, SquarePointer.Inputs.MouseButton)
                 .setCursor(cursor)
             
         }
-        this.addInput("wheel", MouseWheelInput)
+        this.addInput("wheel", SquarePointer.Inputs.MouseWheel)
             .setCursor(cursor)
     }
     

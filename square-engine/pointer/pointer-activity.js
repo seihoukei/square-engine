@@ -1,6 +1,4 @@
-import PointerStateCompiler from "./pointer-state-compiler.js"
-import PointerState from "./pointer-state.js"
-import PointerExecutionContext from "./pointer-execution-context.js"
+import SquarePointer from "./square-pointer.js"
 
 export default class PointerActivity {
     actions = {}
@@ -10,7 +8,7 @@ export default class PointerActivity {
     name
     defaultState = "Default"
     
-    executionContext = new PointerExecutionContext()
+    executionContext = new SquarePointer.ExecutionContext()
     
     constructor() {
 //        this.pointer = pointer
@@ -42,13 +40,13 @@ export default class PointerActivity {
     }
 
     addState(name, source) {
-        const state = PointerStateCompiler.compile(source, this.stateTemplates)
+        const state = SquarePointer.StateCompiler.compile(source, this.stateTemplates)
         state.name = name
         this.states[name] = state
     }
     
     addStateTemplate(name, source) {
-        this.stateTemplates[name] = PointerStateCompiler.tokenize(source)
+        this.stateTemplates[name] = SquarePointer.StateCompiler.tokenize(source)
     }
     
     setState(state) {
@@ -134,7 +132,7 @@ export default class PointerActivity {
                     result = action(input)
                 
                 if (typeof result === "string") {
-                    const actions = PointerStateCompiler.compileActions(result)
+                    const actions = SquarePointer.StateCompiler.compileActions(result)
                     this.executeChain(input, ...actions)
                     return
                 }
@@ -143,7 +141,7 @@ export default class PointerActivity {
                     this.executeChain(input, ...result)
                     return
                 }
-            } else if (element instanceof PointerState) {
+            } else if (element instanceof SquarePointer.State) {
                 this.setState(element)
                 return
             }

@@ -1,5 +1,5 @@
+import SquarePointer from "../square-pointer.js"
 import PointerInteraction from "../pointer-interaction.js"
-import KeyboardInput from "../inputs/keyboard-input.js"
 
 export default class KeyboardInteraction extends PointerInteraction {
     static KEY_ALIAS = {
@@ -27,7 +27,7 @@ export default class KeyboardInteraction extends PointerInteraction {
         super(pointer)
         this.boundEventHandler = this.eventHandler.bind(this)
         for (let key of KeyboardInteraction.KEYS) {
-            this.addInput(key.toLowerCase(), KeyboardInput)
+            this.addInput(key.toLowerCase(), SquarePointer.Inputs.Keyboard)
         }
     }
     

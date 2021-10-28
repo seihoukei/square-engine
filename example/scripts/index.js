@@ -3,7 +3,7 @@ import "../../square-engine/utility/math.js"
 import DOM from "../../square-engine/utility/dom.js"
 import Web from "../../square-engine/utility/web.js"
 import MapScenario from "./scenario.js"
-import Surface from "../../square-engine/surface/surface.js"
+import SquareSurface from "../../square-engine/surface/square-surface.js"
 
 const SOURCES = {
     nodes : "./shaders/nodes",
@@ -25,7 +25,7 @@ window.onload = async () => {
     const holder = DOM.createDiv(grid, "main-container")
     const canvas = DOM.createElement("canvas", "main", holder)
     
-    const surface = new Surface(canvas, {
+    const surface = new SquareSurface(canvas, {
         sources: shaders,
         
         scenarios: {

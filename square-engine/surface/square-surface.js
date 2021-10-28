@@ -1,12 +1,14 @@
-import Pointer from "../pointer/pointer.js"
+import SquarePointer from "../pointer/square-pointer.js"
 import SquareGL from "../gl/square-gl.js"
+import SurfaceScenario from "./surface-scenario.js"
 
-export default class Surface {
+export default class SquareSurface {
+	static Scenario = SurfaceScenario
 	scenarios = {}
 	
 	constructor(canvas, data) {
-		this.renderer = new SquareGL.Renderer(canvas, data)
-		this.pointer = new Pointer(this.renderer.viewport, data.interactions)
+		this.renderer = new SquareGL(canvas, data)
+		this.pointer = new SquarePointer(this.renderer.viewport, data.interactions)
 		
 		for (let [name, ScenarioClass] of Object.entries(data.scenarios)) {
 			this.scenarios[name] = new ScenarioClass(this.renderer, this.pointer)

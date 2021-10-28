@@ -1,9 +1,9 @@
-import SurfaceScenario from "../../square-engine/surface/surface-scenario.js"
 import TestGLScene from "./scene.js"
 import MapActivity from "./activity.js"
 import Geometry from "../../square-engine/geometry/geometry.js"
+import SquareSurface from "../../square-engine/surface/square-surface.js"
 
-export default class MapScenario extends SurfaceScenario {
+export default class MapScenario extends SquareSurface.Scenario {
 	static sceneClass = TestGLScene
 	static activityClass = MapActivity
 	static viewSettings = {

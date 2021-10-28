@@ -1,3 +1,5 @@
+import SquarePointer from "./square-pointer.js"
+
 export default class PointerState {
     static INTERACTION_ALIAS = {	//for convenient addressing
         lmb    : "button0",
@@ -59,9 +61,9 @@ export default class PointerState {
     
     addTrigger(interaction, event, actions) {
         this.triggers[`${
-            PointerState.INTERACTION_ALIAS[interaction] ?? interaction
+            SquarePointer.State.INTERACTION_ALIAS[interaction] ?? interaction
         }.${
-            PointerState.EVENT_ALIAS[event.event] ?? event
+            SquarePointer.State.EVENT_ALIAS[event.event] ?? event
         }`] = actions
     }
     

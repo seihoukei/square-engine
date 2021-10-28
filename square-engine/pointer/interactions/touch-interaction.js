@@ -1,5 +1,5 @@
+import SquarePointer from "../square-pointer.js"
 import PointerInteraction from "../pointer-interaction.js"
-import TouchInput from "../inputs/touch-input.js"
 
 export default class TouchInteraction extends PointerInteraction {
     static MAX_TOUCHES = 3
@@ -9,7 +9,7 @@ export default class TouchInteraction extends PointerInteraction {
         super(pointer)
 
         for (let i = 0; i < TouchInteraction.MAX_TOUCHES; i++) {
-            this.addIndexedInput("touch", i, TouchInput)
+            this.addIndexedInput("touch", i, SquarePointer.Inputs.Touch)
         }
     }
     
