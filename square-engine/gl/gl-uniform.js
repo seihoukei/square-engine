@@ -1,4 +1,4 @@
-import GLTypes from "./gl-types.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLUniform {
     constructor(renderer) {
@@ -11,7 +11,7 @@ export default class GLUniform {
     
         this.name = data.name.match(/[^[]*/)[0]
         
-        const type = GLTypes.get(data.type)
+        const type = SquareGL.Types.get(data.type)
         this.type = type.type
         this.size = type.size
         this.isTexture = type.isTexture

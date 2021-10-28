@@ -1,9 +1,8 @@
 import Trigger from "../utility/trigger.js"
-import GLProgram from "./gl-program.js"
-import GLPositionBuffers from "./gl-position-buffers.js"
 import Viewport from "../viewport/viewport.js"
+import SquareGL from "./square-gl.js"
 
-export default class GLRenderer {
+export default class GlRenderer {
     active = false
     boundFrame = this.frame.bind(this)
     nextFrame = -1
@@ -25,10 +24,10 @@ export default class GLRenderer {
     
     init() {
         this.gl = this.canvas.getContext("webgl2", {alpha : false})
-        this.positionBuffers = new GLPositionBuffers(this)
+        this.positionBuffers = new SquareGL.PositionBuffers(this)
         
         for (let [name, sources] of Object.entries(this.sources)) {
-            this.programs[name] ??= new GLProgram(this, sources)
+            this.programs[name] ??= new SquareGL.Program(this, sources)
             this.programs[name].init()
         }
         

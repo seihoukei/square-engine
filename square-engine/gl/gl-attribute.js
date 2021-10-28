@@ -1,4 +1,4 @@
-import GLTypes from "./gl-types.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLAttribute {
     isPosition = false
@@ -34,7 +34,7 @@ export default class GLAttribute {
         this.name = data.name
         this.glType = data.type
     
-        const type = GLTypes.get(this.glType)
+        const type = SquareGL.Types.get(this.glType)
         
         this.type = type.type
         this.size = type.size

@@ -24,6 +24,6 @@ void main() {
     }
         //size *= 0.1 * u_pixel * min_size;
 
-    v_grid_position = (a_position * size) + u_center;
+    v_grid_position = (a_position * size) + u_center / min_size;
     gl_Position = vec4(a_position, 0.0, 1.0);
 }

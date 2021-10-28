@@ -1,11 +1,11 @@
-import GLRenderer from "../gl-renderer/gl-renderer.js"
 import Pointer from "../pointer/pointer.js"
+import SquareGL from "../gl/square-gl.js"
 
 export default class Surface {
 	scenarios = {}
 	
 	constructor(canvas, data) {
-		this.renderer = new GLRenderer(canvas, data)
+		this.renderer = new SquareGL.Renderer(canvas, data)
 		this.pointer = new Pointer(this.renderer.viewport, data.interactions)
 		
 		for (let [name, ScenarioClass] of Object.entries(data.scenarios)) {

@@ -1,4 +1,4 @@
-import GLPositionBuffers from "./gl-position-buffers.js"
+import SquareGL from "./square-gl.js"
 
 
 export default class GLSceneElement {
@@ -42,7 +42,7 @@ export default class GLSceneElement {
         return this
     }
     
-    setPositionAttribute(name, array = GLPositionBuffers.QUAD_ARRAYS.CENTERED) {
+    setPositionAttribute(name, array = SquareGL.PositionBuffers.QUAD_ARRAYS.CENTERED) {
         const attribute = this.program.attributes[name]
         if (!attribute)
             return

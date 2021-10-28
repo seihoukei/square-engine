@@ -1,5 +1,4 @@
-import GLAttribute from "./gl-attribute.js"
-import GLUniform from "./gl-uniform.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLProgram {
     constructor(renderer, sources) {
@@ -16,8 +15,8 @@ export default class GLProgram {
         
         this.program = this.createProgram(vertexShader, fragmentShader, debugShaders)
         
-        this.uniforms = this.getParameters(gl.ACTIVE_UNIFORMS, GLUniform)
-        this.attributes = this.getParameters(gl.ACTIVE_ATTRIBUTES, GLAttribute)
+        this.uniforms = this.getParameters(gl.ACTIVE_UNIFORMS, SquareGL.Uniform)
+        this.attributes = this.getParameters(gl.ACTIVE_ATTRIBUTES, SquareGL.Attribute)
     }
     
     createShader(type, source, check = false) {

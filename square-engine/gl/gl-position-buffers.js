@@ -1,4 +1,4 @@
-import GLBuffer from "./gl-buffer.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLPositionBuffers {
     static QUAD_ARRAYS = {
@@ -21,7 +21,7 @@ export default class GLPositionBuffers {
         if (oldBuffer)
             return oldBuffer
         
-        const buffer = new GLBuffer(this.renderer, array.length)
+        const buffer = new SquareGL.Buffer(this.renderer, array.length)
         
         buffer.initBuffer()
         buffer.updateData(array, WebGL2RenderingContext.STATIC_DRAW)

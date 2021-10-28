@@ -146,7 +146,7 @@ export default class MapActivity extends PointerActivity {
 //                const mouse = this.getInput("mouse")
 				this.data.lastWorld = input.getWorldPosition(this.data.lastWorld)
 				
-				this.view.zoomAt(this.data.lastWorld.x, this.data.lastWorld.y, - input.change / 10 * this.view.current.zoom)
+				this.view.zoomAt(this.data.lastWorld.x, this.data.lastWorld.y, - Math.sign(input.change) / 10 * this.view.current.zoom)
 			},
 			
 			start_pinch_view(input, anchorInput) {

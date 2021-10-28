@@ -18,8 +18,8 @@ const WORLDVIEW_DEFAULT_SETTINGS = {
 }
 
 const WORLDVIEW_DEFAULT_COMPONENTS = {
-	x : 0, 
-	y : 0, 
+	x : 0,
+	y : 0,
 	zoom : 1,
 }
 
@@ -28,7 +28,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 	constructor(viewport, settings, data) {
 		super()
 
-		if (!viewport) 
+		if (!viewport)
 			throw Error("WorldView can't exist without a viewport")
 
 		this.viewport = viewport
@@ -59,7 +59,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 	}
 
 	// sets target x, y or zoom to a clamped value
-	setClamped(field, value) { 
+	setClamped(field, value) {
 		this.target[field] = Math.clamp(this.min[field], value, this.max[field])
 	}
 
@@ -73,7 +73,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 
 	// sets up x and y limits based on boundaries and target zoom
 	updateXYLimits() {
-		const shrinkX = this.settings.expandView - (this.viewport.width  / 2) / this.target.zoom		
+		const shrinkX = this.settings.expandView - (this.viewport.width  / 2) / this.target.zoom
 		this.min.x = Math.min(this.boundaries.centerX, this.boundaries.left  - shrinkX)
 		this.max.x = Math.max(this.boundaries.centerX, this.boundaries.right + shrinkX)
 
@@ -82,7 +82,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 		this.max.y = Math.max(this.boundaries.centerY, this.boundaries.top    + shrinkY)
 
 		//update target to clamped coordinates
-		this.setXY(this.target.x, this.target.y) 
+		this.setXY(this.target.x, this.target.y)
 	}
 
 	// sets up zoom limits based on boundaries and viewport size
@@ -93,9 +93,9 @@ export default class WorldView extends Trigger.Class(["change"]) {
 		this.max.zoom = Math.min(this.viewport.width, this.viewport.height) / this.settings.minView
 
 		this.min.zoom = Math.min(
-			this.max.zoom, 
+			this.max.zoom,
 			this.viewport.width  / (this.boundaries.width  + 2 * this.settings.expandView),
-			this.viewport.height / (this.boundaries.height + 2 * this.settings.expandView))	
+			this.viewport.height / (this.boundaries.height + 2 * this.settings.expandView))
 	
 		//update target to clamped zoom, which also updates x and y limits
 		if (minZoom)
@@ -106,7 +106,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 
 // public
 
-	// advances current x, y and zoom towards target 
+	// advances current x, y and zoom towards target
 	advance(time = 10) {
 		if (this.current.x === this.target.x && this.current.y === this.target.y && this.current.zoom === this.target.zoom)
 			return
@@ -143,13 +143,13 @@ export default class WorldView extends Trigger.Class(["change"]) {
 	getInfo(info = {}) {
 		this.getSize(info)
 		this.getView(info)
-			
+		
 		info.left   = info.x - info.width  / 2
 		info.bottom = info.y - info.height / 2
 		
 		info.right = info.left   + info.width
 		info.top   = info.bottom + info.height
-			
+		
 		return info
 	}
 
@@ -185,7 +185,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 			this.current.y = this.target.y
 			if (event)
 				this.#updated()
-		}		
+		}
 	}
 
 	// set target zoom, update x and y limits accordingly
@@ -201,7 +201,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 			this.current.zoom = this.target.zoom
 			if (event)
 				this.#updated()
-		}			
+		}
 	}
 
 	// set target x, y and zoom at once
@@ -213,15 +213,15 @@ export default class WorldView extends Trigger.Class(["change"]) {
 	// adjust x and y by given values
 	translate(dx, dy, instant = false, event = true) {
 		this.setXY(
-			this.target.x + dx, 
-			this.target.y + dy, 
+			this.target.x + dx,
+			this.target.y + dy,
 			instant, event)
 	}
 
 	// adjust zoom by value
 	zoom(value, instant = false, event = true) {
 		this.setZoom(
-			this.target.zoom + value, 
+			this.target.zoom + value,
 			instant, event)
 	}
 
@@ -303,7 +303,7 @@ export default class WorldView extends Trigger.Class(["change"]) {
 		//adjust zoom
 		const distanceWorld = Math.hypot(worldX1 - worldX2, worldY1 - worldY2)
 		const distanceReal  = Math.hypot(realX1  - realX2 , realY1  - realY2 )
-		this.setZoom(distanceReal / this.viewport.scaling / distanceWorld, true)
+		this.setZoom(distanceReal *  this.viewport.scaling / distanceWorld, true)
 		
 		//move center point
 		this.moveWorldPoint(

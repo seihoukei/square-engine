@@ -1,8 +1,6 @@
-import GLBuffer from "./gl-buffer.js"
 import Trigger from "../utility/trigger.js"
-import GLTexture from "./gl-texture.js"
-import GLTypes from "./gl-types.js"
 import WorldView from "../viewport/world-view.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLScene extends Trigger.Class(["updateView", "activate", "deactivate"]) {
     buffers = {}
@@ -84,10 +82,10 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     }
     
     createBuffer(name, type, length, options) {
-        const buffer = new GLBuffer(this.renderer, length)
+        const buffer = new SquareGL.Buffer(this.renderer, length)
     
         buffer.initBuffer()
-        buffer.initData(options.normalize ?? type, GLTypes.get(type).size)
+        buffer.initData(options.normalize ?? type, SquareGL.Types.get(type).size)
     
         this.buffers[name] = buffer
         return buffer
@@ -96,7 +94,7 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     getBuffer(name, type, length, options = {}) {
         if (this.buffers[name] !== undefined) {
             const buffer = this.buffers[name]
-            if (type !== undefined && buffer.type !== (options.normalize ?? GLTypes.get(type).type))
+            if (type !== undefined && buffer.type !== (options.normalize ?? SquareGL.Types.get(type).type))
                 throw new Error ("Buffer type collision")
             if (length !== undefined && buffer.length !== length)
                 console.warn("Buffer length mismatch")
@@ -108,7 +106,7 @@ export default class GLScene extends Trigger.Class(["updateView", "activate", "d
     }
     
     createTexture(name, options = {}) {
-        const texture = new GLTexture(this.renderer, options)
+        const texture = new SquareGL.Texture(this.renderer, options)
     
         texture.init()
     

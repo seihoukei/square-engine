@@ -1,4 +1,4 @@
-import GLTypes from "./gl-types.js"
+import SquareGL from "./square-gl.js"
 
 export default class GLBuffer {
     initialized = false
@@ -22,7 +22,7 @@ export default class GLBuffer {
         }
         
         this.glType = glType
-        this.glData = GLTypes.get(glType)
+        this.glData = SquareGL.Types.get(glType)
     
         this.size = size ?? this.glData.size
         

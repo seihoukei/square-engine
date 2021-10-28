@@ -17,6 +17,7 @@ window.serviceWorkerLoader = (div = "loader") => {
         const loader = document.createElement("span")
         serviceWorkerLoaderHolder.appendChild(loader)
         loader.innerText = `\nFetching ${url}...`
+        loaderHolder.scrollTo(0, loaderHolder.scrollHeight)
         return loader
     }
     
@@ -44,4 +45,3 @@ window.serviceWorkerLoader = (div = "loader") => {
         delete window.stopServiceWorkerLoader
     }
 }
-

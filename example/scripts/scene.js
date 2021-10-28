@@ -1,10 +1,9 @@
-import GLSceneElement from "../../square-engine/gl-renderer/gl-scene-element.js"
-import GLScene from "../../square-engine/gl-renderer/gl-scene.js"
+import SquareGL from "../../square-engine/gl/square-gl.js"
 
 const MAX_NODES = 1024
 const AVERAGE_REGION_EDGES = 8
 
-class BGNodesElement extends GLSceneElement {
+class BGNodesElement extends SquareGL.SceneElement {
 	build() {
 		this.setAlpha(true)
 		this.setMaxLength(MAX_NODES, 0)
@@ -13,11 +12,11 @@ class BGNodesElement extends GLSceneElement {
 //        this.setTimeUniform("u_now")
 		this.setPositionAttribute("a_position")
 		this.setAttributeBuffer("a_node_data", "nodeData")
-		this.setTargetTexture("bg_nodes", [0.5,0.5,0.5,1.0])
+		this.setTargetTexture("distortion_map", [0.5,0.5,0.5,1.0])
 	}
 }
 
-class BGElement extends GLSceneElement {
+class BGElement extends SquareGL.SceneElement {
 	build() {
 		this.setAlpha(true)
 		this.setMaxLength(1)
@@ -25,11 +24,11 @@ class BGElement extends GLSceneElement {
 		this.setViewUniforms("u_center", "u_size", "u_pixel")
 		this.setTimeUniform("u_now")
 		this.setPositionAttribute("a_position")
-		this.setTexture("u_bg_nodes", "bg_nodes")
+		this.setTexture("u_distortion_map", "distortion_map")
 	}
 }
 
-class RegionsElement extends GLSceneElement {
+class RegionsElement extends SquareGL.SceneElement {
 	build() {
 		this.setAlpha(true)
 		this.setMaxLength(MAX_NODES * AVERAGE_REGION_EDGES, 0)
@@ -45,7 +44,7 @@ class RegionsElement extends GLSceneElement {
 	}
 }
 
-class NodesElement extends GLSceneElement {
+class NodesElement extends SquareGL.SceneElement {
 	build() {
 		this.setAlpha(true)
 		this.setMaxLength(MAX_NODES, 0)
@@ -59,7 +58,7 @@ class NodesElement extends GLSceneElement {
 	}
 }
 
-export default class TestGLScene extends GLScene {
+export default class TestGLScene extends SquareGL.Scene {
 	build() {
 		this.createViewportTexture("bg_nodes")
 		

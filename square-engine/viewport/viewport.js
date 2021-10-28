@@ -27,7 +27,7 @@ export default class Viewport extends Trigger.Class(["change"]) {
 		
 		this.scaling = this.#settings.devicePixelRatio / this.#settings.canvasScale
 		
-		//ui surface size
+		//ui surface size	
 		this.width  = this.realWidth  * this.scaling
 		this.height = this.realHeight * this.scaling
 		

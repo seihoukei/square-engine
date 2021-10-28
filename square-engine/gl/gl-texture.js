@@ -1,3 +1,5 @@
+import SquareGL from "./square-gl.js"
+
 export default class GLTexture {
     static DEFAULT_SIZE = 512
     lastGl
@@ -41,8 +43,8 @@ export default class GLTexture {
             gl.texImage3D(this.type,
                 0, //mipLevel
                 this.options.internalFormat ?? gl.RGBA,
-                this.options.width ?? GLTexture.DEFAULT_SIZE,
-                this.options.height ?? GLTexture.DEFAULT_SIZE,
+                this.options.width ?? SquareGL.Texture.DEFAULT_SIZE,
+                this.options.height ?? SquareGL.Texture.DEFAULT_SIZE,
                 this.options.layers ?? 1,
                 0,
                 this.options.format ?? gl.RGBA,

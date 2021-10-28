@@ -7,7 +7,7 @@ in vec2 v_position;
 flat in float v_distortion_scale;
 
 uniform highp float u_now;
-uniform sampler2D u_bg_nodes;
+uniform sampler2D u_distortion_map;
 uniform float u_front;
 
 out vec4 color;
@@ -41,7 +41,7 @@ void main() {
         if (noise <= 0.0)
             discard;
     } else {
-        vec4 distortion = texture(u_bg_nodes, v_position * 0.5 + 0.5);
+        vec4 distortion = texture(u_distortion_map, v_position * 0.5 + 0.5);
         vec2 distorted_grid_position = grid_position + (distortion.xy - 0.5) * 6.0 * v_distortion_scale;
         //        color += distortion;
         noise += stars(distorted_grid_position / 2.5, 100.0 - u_now / 400.0, 0.007);
